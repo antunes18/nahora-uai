@@ -18,3 +18,6 @@ class SchedulingCreateDto(BaseModel):
     name: str
     user_id: int
     phone: str
+
+    class Config:
+        from_attributes = True

@@ -74,19 +74,18 @@ class SchedulingService:
         existing_scheduling = self.scheduling_repo.find_one_scheduling(scheduling_id)
 
         self.validate_scheduling(scheduling_dto)
-        
+
         if not existing_scheduling:
             raise scheduling_exceptions.NotFound()
 
-        # Update fields from DTO
         existing_scheduling.hour = scheduling_dto.hour
         existing_scheduling.date = scheduling_dto.date
         existing_scheduling.name = scheduling_dto.name
         existing_scheduling.phone = scheduling_dto.phone
-        # user_id is not updated as per instruction
 
-        # Call repository to save changes
-        return self.scheduling_repo.update_scheduling(scheduling_id, existing_scheduling)
+        return self.scheduling_repo.update_scheduling(
+            scheduling_id, existing_scheduling
+        )
 
 
     def validate_scheduling(self, dto: SchedulingDTO):

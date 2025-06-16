@@ -1,5 +1,6 @@
 from typing import List
 
+from api.core.response_message import ResponseMessage
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 
@@ -92,7 +93,7 @@ def get_all_schedulings_by_user(
     skip: int = 0,
     limit: int = 10,
     scheduling_services: services = Depends(get_scheduling_services),
-) :
+):
     print("aaaaaaaaaaaa")
     return scheduling_services.get_all_schedulings_by_user(skip, limit, user_id)
 
@@ -124,11 +125,11 @@ def get_one_scheduling(
 
 @router.delete(
     "/delete/{scheduling_id}",
-    response_model=MsgReturn,
+    response_model=ResponseMessage,
     response_model_exclude_unset=True,
     responses={
         200: {
-            "model": MsgReturn,
+            "model": ResponseMessage,
             "description": "Scheduling excluído",
         },
         404: {
@@ -150,11 +151,11 @@ def delete_scheduling(
 
 @router.put(
     "/restore/{scheduling_id}",
-    response_model=MsgReturn,
+    response_model=ResponseMessage,
     response_model_exclude_unset=True,
     responses={
         200: {
-            "model": MsgReturn,
+            "model": ResponseMessage,
             "description": "Scheduling restaurado",
         },
         404: {
