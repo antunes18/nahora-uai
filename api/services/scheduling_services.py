@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 
 from api.exceptions import scheduling_exceptions, user_exceptions
-from api.models.dto.scheduling_dto import SchedulingDTO
+from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto
 from api.models.scheduling import Scheduling
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
@@ -15,7 +15,7 @@ class SchedulingService:
         self.scheduling_repo = scheduling_repo
         self.user_repo = user_repo
 
-    def create_scheduling(self, dto: SchedulingDTO):
+    def create_scheduling(self, dto: SchedulingCreateDto):
 
 
         self.validate_scheduling(dto)
@@ -70,7 +70,7 @@ class SchedulingService:
         else:
             raise scheduling_exceptions.NotFound()
 
-    def update_scheduling(self, scheduling_id: int, scheduling_dto: SchedulingDTO.Scheduling): # Parameter renamed
+    def update_scheduling(self, scheduling_id: int, scheduling_dto: SchedulingDTO): # Parameter renamed
         existing_scheduling = self.scheduling_repo.find_one_scheduling(scheduling_id)
 
         self.validate_scheduling(scheduling_dto)
