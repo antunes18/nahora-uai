@@ -3,7 +3,7 @@ from api.exceptions import scheduling_exceptions
 
 from datetime import date, datetime
 
-class Scheduling(BaseModel):
+class SchedulingDTO(BaseModel):
     date: date
     hour: int
     name: str
