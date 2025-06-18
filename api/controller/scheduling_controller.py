@@ -6,13 +6,15 @@ from api.core.jwt_bearer import JwtBearer
 from api.core.database import get_db
 from api.exceptions.message import GenericError
 from api.exceptions import scheduling_exceptions  # Import scheduling_exceptions
-from api.models import scheduling
 from api.models.enums.type import MsgReturn
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
-from api.services import scheduling_services
 from api.services.scheduling_services import SchedulingService as services
+<<<<<<< HEAD
 from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto
+=======
+from api.models.dto.scheduling_dto import SchedulingDTO
+>>>>>>> 13e0183 (merge: resolve conflict in scheduling_dto and scheduling_controller)
 
 
 router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
