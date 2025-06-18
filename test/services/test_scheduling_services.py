@@ -1,121 +1,120 @@
-import pytest
-from unittest.mock import MagicMock, patch
-from datetime import date, datetime, timedelta
+import re
+from unittest.mock import Mock
 
+from fastapi import responses
+from api.models.dto import scheduling_dto
+from api.models.scheduling import Scheduling
+from api.models.user import User
+from api.repository.scheduling_repository import SchedulingReposistory
 from api.services.scheduling_services import SchedulingService
-from api.models.dto.scheduling_dto import Scheduling as SchedulingDTO
-from api.models.scheduling import Scheduling as SchedulingModel
-from api.exceptions import scheduling_exceptions, user_exceptions
+from test.mocks.scheduling import (
+    mock_scheduling_create,
+    mock_scheduling_services,
+    mock_scheduling_repository,
+    mock_scheduling,
+    mock_scheduling_create,
+    mock_scheduling_list,
+    mock_scheduling_update,
+)
+from test.mocks.user import mock_user_repository, mock_user
 
-@pytest.fixture
-def mock_scheduling_repo():
-    return MagicMock()
 
-@pytest.fixture
-def mock_user_repo():
-    return MagicMock()
+class TestScheulingServices:
+    def test_create_scheduling(
+        self,
+        mock_scheduling_services: SchedulingService,
+        mock_scheduling_repository: Mock,
+        mock_user_repository: Mock,
+        mock_scheduling: Scheduling,
+        mock_scheduling_create: scheduling_dto.Scheduling,
+    ):
+        mock_scheduling_repository.find_scheduling_by_date_and_hour.return_value = None
+        mock_user_repository.get_user.return_value = mock_user
+        mock_scheduling_repository.create.return_value = mock_scheduling
 
-@pytest.fixture
-def scheduling_service(mock_scheduling_repo, mock_user_repo):
-    return SchedulingService(scheduling_repo=mock_scheduling_repo, user_repo=mock_user_repo)
+        response = mock_scheduling_services.create_scheduling(mock_scheduling_create)
 
-def test_create_scheduling_success(scheduling_service, mock_scheduling_repo, mock_user_repo):
-    dto = SchedulingDTO(
-        date=date.today() + timedelta(days=1),
-        hour=10,
-        name="Test User",
-        user_id=1,
-        phone="1234567890"
-    )
-    mock_user_repo.get_user.return_value = MagicMock() # Simula usuário existente
-    mock_scheduling_repo.find_scheduling_by_date_and_hour.return_value = None # Simula não haver agendamento existente
+        assert response is not None
+        assert response.hour == mock_scheduling.hour
+        assert response.date == mock_scheduling.date
+        assert response.name == mock_scheduling.name
+        assert response.phone == mock_scheduling.phone
+        assert response.user_id == mock_scheduling.user_id
 
-    new_scheduling_model = SchedulingModel(id=1, **dto.model_dump())
-    mock_scheduling_repo.create.return_value = new_scheduling_model
+    def test_get_all_sheduling(
+        self,
+        mock_scheduling_repository: Mock,
+        mock_scheduling_services: SchedulingService,
+        mock_user: User,
+    ):
+        mock_scheduling_repository.find_all.return_value = mock_scheduling_list
 
-    result = scheduling_service.create_scheduling(dto)
+        response = mock_scheduling_services.get_all_schedulings(skip=0, limit=10)
 
-    mock_user_repo.get_user.assert_called_once_with(dto.user_id)
-    mock_scheduling_repo.find_scheduling_by_date_and_hour.assert_called_once_with(dto.date, dto.hour)
-    mock_scheduling_repo.create.assert_called_once()
-    assert result.id == 1
-    assert result.name == dto.name
+        assert response is not None
 
-def test_create_scheduling_already_exists(scheduling_service, mock_scheduling_repo, mock_user_repo):
-    dto = SchedulingDTO(
-        date=date.today() + timedelta(days=1),
-        hour=10,
-        name="Test User",
-        user_id=1,
-        phone="1234567890"
-    )
-    mock_user_repo.get_user.return_value = MagicMock()
-    mock_scheduling_repo.find_scheduling_by_date_and_hour.return_value = SchedulingModel(id=1, **dto.model_dump()) # Simula agendamento existente
+    def test_get_scheduling(
+        self,
+        mock_scheduling_repository: Mock,
+        mock_scheduling_services: SchedulingService,
+        mock_scheduling: Scheduling,
+    ):
+        mock_scheduling_repository.find_one_scheduling.return_value = mock_scheduling
 
-    with pytest.raises(scheduling_exceptions.AlreadyExist):
-        scheduling_service.create_scheduling(dto)
+        response = mock_scheduling_services.get_scheduling(mock_scheduling.id)
 
-def test_create_scheduling_user_not_found(scheduling_service, mock_user_repo):
-    dto = SchedulingDTO(
-        date=date.today() + timedelta(days=1),
-        hour=10,
-        name="Test User",
-        user_id=1,
-        phone="1234567890"
-    )
-    mock_user_repo.get_user.return_value = None # Simula usuário não encontrado
+        assert response is not None
 
-    with pytest.raises(user_exceptions.UserNotFound):
-        scheduling_service.create_scheduling(dto)
+        assert response.hour == mock_scheduling.hour
+        assert response.date == mock_scheduling.date
+        assert response.name == mock_scheduling.name
+        assert response.phone == mock_scheduling.phone
+        assert response.user_id == mock_scheduling.user_id
 
-def test_update_scheduling_success(scheduling_service, mock_scheduling_repo):
-    scheduling_id = 1
-    dto = SchedulingDTO(
-        date=date.today() + timedelta(days=2), # Nova data
-        hour=15, # Nova hora
-        name="Updated User Test",
-        user_id=1, # user_id não deve ser alterado pelo update_scheduling do serviço
-        phone="0987654321"
-    )
+    def test_delete_scheduling(
+        self,
+        mock_scheduling_repository: Mock,
+        mock_scheduling_services: SchedulingService,
+        mock_scheduling: Scheduling,
+    ):
+        mock_scheduling_repository.delete_scheduling(
+            mock_scheduling.id
+        ).return_value = mock_scheduling
+        response = mock_scheduling_services.delete_scheduling(mock_scheduling.id)
+        assert response is not None
 
-    existing_scheduling = SchedulingModel(
-        id=scheduling_id,
-        date=date.today() + timedelta(days=1),
-        hour=10,
-        name="Old User Test",
-        user_id=1,
-        phone="1234567890",
-        is_deleted=False
-    )
-    mock_scheduling_repo.find_one_scheduling.return_value = existing_scheduling
+    def test_restore_scheduling(
+        self,
+        mock_scheduling_repository: Mock,
+        mock_scheduling_services: SchedulingService,
+        mock_scheduling: Scheduling,
+    ):
+        mock_scheduling_repository.restore_scheduling(
+            mock_scheduling.id
+        ).return_value = mock_scheduling
 
-    # O método update_scheduling do repo deve retornar o objeto atualizado
-    # Para simplificar, vamos fazer com que ele retorne o mesmo objeto que foi modificado
-    mock_scheduling_repo.update_scheduling.return_value = existing_scheduling
+        response = mock_scheduling_services.restore_scheduling(mock_scheduling.id)
+        assert response is not None
 
-    result = scheduling_service.update_scheduling(scheduling_id, dto)
+    def test_update_scheduling(
+        self,
+        mock_scheduling_repository: Mock,
+        mock_scheduling_services: SchedulingService,
+        mock_scheduling: Scheduling,
+        mock_scheduling_update: scheduling_dto.Scheduling,
+    ):
+        mock_scheduling_repository.find_one_scheduling.return_value = mock_scheduling
+        mock_scheduling_repository.update_scheduling.return_value = (
+            mock_scheduling_update
+        )
 
-    mock_scheduling_repo.find_one_scheduling.assert_called_once_with(scheduling_id)
-    mock_scheduling_repo.update_scheduling.assert_called_once_with(scheduling_id, existing_scheduling)
+        response = mock_scheduling_services.update_scheduling(
+            mock_scheduling.id, mock_scheduling_update
+        )
 
-    assert result.name == dto.name
-    assert result.date == dto.date
-    assert result.hour == dto.hour
-    assert result.phone == dto.phone
-    assert existing_scheduling.name == dto.name # Verifica se o objeto original foi modificado
-
-def test_update_scheduling_not_found(scheduling_service, mock_scheduling_repo):
-    scheduling_id = 99
-    dto = SchedulingDTO(
-        date=date.today() + timedelta(days=1),
-        hour=10,
-        name="Test User",
-        user_id=1,
-        phone="1234567890"
-    )
-    mock_scheduling_repo.find_one_scheduling.return_value = None # Simula não encontrado
-
-    with pytest.raises(scheduling_exceptions.NotFound):
-        scheduling_service.update_scheduling(scheduling_id, dto)
-
-# Adicione mais testes para get_all_schedulings, get_scheduling, delete_scheduling, restore_scheduling
+        assert response is not None
+        assert response.hour == mock_scheduling_update.hour
+        assert response.date == mock_scheduling_update.date
+        assert response.name == mock_scheduling_update.name
+        assert response.phone == mock_scheduling_update.phone
+        assert response.user_id == mock_scheduling_update.user_id

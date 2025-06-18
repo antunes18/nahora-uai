@@ -1,87 +1,153 @@
-import pytest
-from unittest.mock import MagicMock, patch
-from datetime import date, datetime, timedelta
-from sqlalchemy import extract
-
+from operator import le
+from api.models.dto import scheduling_dto
+from api.models.scheduling import Scheduling
+from api.models.user import User
 from api.repository.scheduling_repository import SchedulingReposistory
-from api.models.scheduling import Scheduling as SchedulingModel
+from test.mocks.scheduling import (
+    mock_scheduling_list,
+    real_scheduling_repository,
+    mock_scheduling,
+    mock_scheduling_update,
+)
+from test.mocks.user import mock_user
 
-# Mock da sessão do SQLAlchemy para não interagir com o banco
-@pytest.fixture
-def mock_db_session():
-    session = MagicMock()
-    # Mock para o query e seus encadeamentos (filter, first, all, etc.)
-    session.query.return_value.filter.return_value.first.return_value = None
-    session.query.return_value.filter.return_value.all.return_value = []
-    session.query.return_value.offset.return_value.limit.return_value.all.return_value = []
-    return session
 
-@pytest.fixture
-def scheduling_repository(mock_db_session):
-    return SchedulingReposistory(session=mock_db_session)
+class TestScheulingRepository:
+    def test_create(
+        self,
+        real_scheduling_repository: SchedulingReposistory,
+        mock_scheduling: Scheduling,
+        mock_user: User,
+    ):
+        data = real_scheduling_repository.create(mock_scheduling)
 
-def test_find_scheduling_by_date_and_hour_found(scheduling_repository, mock_db_session):
-    target_date = date.today() + timedelta(days=1)
-    target_hour = 10
+        assert data is not None
+        assert data.id == mock_scheduling.id
+        assert data.date == mock_scheduling.date
+        assert data.hour == mock_scheduling.hour
+        assert data.name == mock_scheduling.name
+        assert data.phone == mock_scheduling.phone
+        assert data.user_id == mock_scheduling.user_id
+        assert data.user == mock_scheduling.user
+        assert data.is_deleted == mock_scheduling.is_deleted
 
-    expected_scheduling = SchedulingModel(
-        id=1,
-        date=datetime.combine(target_date, datetime.min.time()).replace(hour=target_hour),
-        hour=target_hour,
-        name="Test",
-        phone="123",
-        user_id=1
-    )
+    def test_find_scheduling_by_date_and_hour(
+        self,
+        real_scheduling_repository: SchedulingReposistory,
+        mock_scheduling: Scheduling,
+        mock_user: User,
+    ):
+        real_scheduling_repository.session.add(mock_scheduling)
+        real_scheduling_repository.session.commit()
 
-    # Configurar o mock para retornar o agendamento esperado
-    # A consulta exata pode ser complexa de mockar diretamente com filter().first()
-    # Uma abordagem mais simples para este template é mockar o resultado final de first()
-    # ao qual a query filtrada resolveria.
+        data = real_scheduling_repository.find_scheduling_by_date_and_hour(
+            date=mock_scheduling.date, hour=mock_scheduling.hour
+        )
+        assert data is not None
+        assert data.id == mock_scheduling.id
+        assert data.date == mock_scheduling.date
+        assert data.hour == mock_scheduling.hour
+        assert data.name == mock_scheduling.name
+        assert data.phone == mock_scheduling.phone
+        assert data.user_id == mock_scheduling.user_id
+        assert data.user == mock_scheduling.user
+        assert data.is_deleted == mock_scheduling.is_deleted
 
-    # Criamos um mock para o objeto query
-    mock_query = MagicMock()
-    mock_db_session.query.return_value = mock_query
+    def test_find_all(
+        self,
+        real_scheduling_repository: SchedulingReposistory,
+        mock_scheduling: Scheduling,
+        mock_scheduling_list: list[Scheduling],
+        mock_user: User,
+    ):
+        real_scheduling_repository.session.add_all(mock_scheduling_list)
+        real_scheduling_repository.session.commit()
 
-    # Mockamos o encadeamento de filter().first()
-    mock_query.filter.return_value.first.return_value = expected_scheduling
+        data = real_scheduling_repository.find_all(skip=0, limit=10)
 
-    result = scheduling_repository.find_scheduling_by_date_and_hour(target_date, target_hour)
+        assert data is not None
+        # assert len(data) == len(mock_scheduling_list)
 
-    # Verifique se o session.query foi chamado com SchedulingModel
-    mock_db_session.query.assert_called_with(SchedulingModel)
+    def test_find_one_scheduling(
+        self,
+        real_scheduling_repository: SchedulingReposistory,
+        mock_scheduling: Scheduling,
+        mock_user: User,
+    ):
+        real_scheduling_repository.session.add(mock_scheduling)
+        real_scheduling_repository.session.commit()
 
-    # Verificar se o filtro foi chamado (aqui é mais complexo verificar os argumentos exatos do filtro sem mais detalhes)
-    # No mínimo, podemos verificar se filter foi chamado.
-    mock_query.filter.assert_called()
+        data = real_scheduling_repository.find_one_scheduling(mock_scheduling.id)
 
-    assert result == expected_scheduling
+        assert data is not None
+        assert data.id == mock_scheduling.id
+        assert data.date == mock_scheduling.date
+        assert data.hour == mock_scheduling.hour
+        assert data.name == mock_scheduling.name
+        assert data.phone == mock_scheduling.phone
+        assert data.user_id == mock_scheduling.user_id
+        assert data.user == mock_scheduling.user
+        assert data.is_deleted == mock_scheduling.is_deleted
 
-def test_find_scheduling_by_date_and_hour_not_found(scheduling_repository, mock_db_session):
-    target_date = date.today() + timedelta(days=1)
-    target_hour = 11
+    def test_delete_scheduling(
+        self,
+        real_scheduling_repository: SchedulingReposistory,
+        mock_scheduling: Scheduling,
+        mock_user: User,
+    ):
+        real_scheduling_repository.session.add(mock_scheduling)
+        real_scheduling_repository.session.commit()
 
-    mock_query = MagicMock()
-    mock_db_session.query.return_value = mock_query
-    mock_query.filter.return_value.first.return_value = None # Simula não encontrar
+        data = real_scheduling_repository.delete_scheduling(mock_scheduling.id)
 
-    result = scheduling_repository.find_scheduling_by_date_and_hour(target_date, target_hour)
+        assert data is not None
+        assert data.id == mock_scheduling.id
+        assert data.date == mock_scheduling.date
+        assert data.hour == mock_scheduling.hour
+        assert data.name == mock_scheduling.name
+        assert data.phone == mock_scheduling.phone
+        assert data.user_id == mock_scheduling.user_id
+        assert data.user == mock_scheduling.user
+        assert data.is_deleted == mock_scheduling.is_deleted
 
-    assert result is None
+    def test_restore_scheduling(
+        self,
+        real_scheduling_repository: SchedulingReposistory,
+        mock_scheduling: Scheduling,
+        mock_user: User,
+    ):
+        real_scheduling_repository.session.add(mock_scheduling)
+        real_scheduling_repository.session.commit()
 
-# Adicione mais testes para create, find_all, find_one_scheduling, delete_scheduling,
-# restore_scheduling, update_scheduling no repositório.
-# Lembre-se que para create, commit, refresh, add devem ser mockados na sessão.
-# Exemplo para create:
-# def test_create_scheduling_repo(scheduling_repository, mock_db_session):
-#     scheduling_data = SchedulingModel(date=datetime.now(), hour=10, name="Test", phone="123", user_id=1)
-#
-#     # O método create deve retornar o objeto scheduling após adicioná-lo e dar refresh
-#     # Podemos fazer o mock de refresh para simplesmente retornar o objeto
-#     mock_db_session.refresh = lambda obj: obj
-#
-#     result = scheduling_repository.create(scheduling_data)
-#
-#     mock_db_session.add.assert_called_once_with(scheduling_data)
-#     mock_db_session.commit.assert_called_once()
-#     # mock_db_session.refresh.assert_called_once_with(scheduling_data) # Comentado pois o lambda acima é mais simples para o template
-#     assert result == scheduling_data
+        data = real_scheduling_repository.restore_scheduling(mock_scheduling.id)
+
+        assert data is not None
+        assert data.id == mock_scheduling.id
+        assert data.date == mock_scheduling.date
+        assert data.hour == mock_scheduling.hour
+        assert data.name == mock_scheduling.name
+        assert data.phone == mock_scheduling.phone
+        assert data.user_id == mock_scheduling.user_id
+        assert data.user == mock_scheduling.user
+        assert data.is_deleted == mock_scheduling.is_deleted
+
+    def test_update_scheduling(
+        self,
+        real_scheduling_repository: SchedulingReposistory,
+        mock_scheduling: Scheduling,
+        mock_scheduling_update: scheduling_dto.Scheduling,
+        mock_user: User,
+    ):
+        real_scheduling_repository.session.add(mock_scheduling)
+        real_scheduling_repository.session.commit()
+
+        data = real_scheduling_repository.update_scheduling(
+            mock_scheduling.id, mock_scheduling_update
+        )
+
+        assert data is not None
+        assert data.date == mock_scheduling_update.date
+        assert data.hour == mock_scheduling_update.hour
+        assert data.name == mock_scheduling_update.name
+        assert data.phone == mock_scheduling_update.phone
+        assert data.user_id == mock_scheduling_update.user_id

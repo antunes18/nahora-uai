@@ -1,12 +1,12 @@
 from typing import List
-
 from api.core.response_message import ResponseMessage
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-
+from api.core.jwt_bearer import JwtBearer
 from api.core.database import get_db
 from api.exceptions.message import GenericError
-from api.exceptions import scheduling_exceptions # Import scheduling_exceptions
+from api.exceptions import scheduling_exceptions  # Import scheduling_exceptions
+from api.models import scheduling
 from api.models.enums.type import MsgReturn
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
@@ -14,7 +14,7 @@ from api.services.scheduling_services import SchedulingService as services
 from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto
 
 
-router = APIRouter(prefix="/scheduling", tags=["scheduling"])
+router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
 
 
 def get_scheduling_repo(db: Session = Depends(get_db)) -> SchedulingReposistory:
@@ -51,6 +51,7 @@ def get_scheduling_services(
             "description": "Usuário com esse id não existe!",
         },
     },
+    dependencies=[Depends(JwtBearer())],
 )
 def create_Scheduling(
     scheduling: SchedulingCreateDto,
@@ -69,6 +70,7 @@ def create_Scheduling(
             "description": "Lista de Schedulings",
         }
     },
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_scheduling(
     skip: int = 0,
@@ -111,13 +113,14 @@ def get_all_schedulings_by_user(
             "description": "Scheduling Não Encontrado",
         },
     },
+    dependencies=[Depends(JwtBearer())],
 )
 def get_one_scheduling(
     scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
 ):
     try:
         return scheduling_services.get_scheduling(scheduling_id)
-    except scheduling_exceptions.NotFound as e: # Catch specific exception first
+    except scheduling_exceptions.NotFound as e:  # Catch specific exception first
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -137,13 +140,14 @@ def get_one_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
+    dependencies=[Depends(JwtBearer())],
 )
 def delete_scheduling(
     scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
 ):
     try:
         return scheduling_services.delete_scheduling(scheduling_id)
-    except scheduling_exceptions.NotFound as e: # Catch specific exception first
+    except scheduling_exceptions.NotFound as e:  # Catch specific exception first
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -163,13 +167,14 @@ def delete_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
+    dependencies=[Depends(JwtBearer())],
 )
 def restore_scheduling(
     scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
 ):
     try:
         return scheduling_services.restore_scheduling(scheduling_id)
-    except scheduling_exceptions.NotFound as e: # Catch specific exception first
+    except scheduling_exceptions.NotFound as e:  # Catch specific exception first
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -189,6 +194,7 @@ def restore_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
+    dependencies=[Depends(JwtBearer())],
 )
 def update_scheduling(
     scheduling_id: int,
@@ -197,7 +203,7 @@ def update_scheduling(
 ):
     try:
         return scheduling_services.update_scheduling(scheduling_id, scheduling)
-    except scheduling_exceptions.NotFound as e: # Catch specific exception first
+    except scheduling_exceptions.NotFound as e:  # Catch specific exception first
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
