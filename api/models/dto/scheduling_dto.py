@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class SchedulingDTO(BaseModel):
+    id: int
     date: datetime
     hour: int
     name: str
