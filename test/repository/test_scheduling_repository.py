@@ -1,5 +1,4 @@
-from operator import le
-from api.models.dto import scheduling_dto
+from api.models.dto.scheduling_dto import SchedulingDTO
 from api.models.scheduling import Scheduling
 from api.models.user import User
 from api.repository.scheduling_repository import SchedulingReposistory
@@ -12,7 +11,7 @@ from test.mocks.scheduling import (
 from test.mocks.user import mock_user
 
 
-class TestScheulingRepository:
+class TestSchedulingRepository:
     def test_create(
         self,
         real_scheduling_repository: SchedulingReposistory,
@@ -31,7 +30,7 @@ class TestScheulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_find_scheduling_by_date_and_hour(
+    def find_scheduling_by_date_and_hour_and_user(
         self,
         real_scheduling_repository: SchedulingReposistory,
         mock_scheduling: Scheduling,
@@ -40,8 +39,8 @@ class TestScheulingRepository:
         real_scheduling_repository.session.add(mock_scheduling)
         real_scheduling_repository.session.commit()
 
-        data = real_scheduling_repository.find_scheduling_by_date_and_hour(
-            date=mock_scheduling.date, hour=mock_scheduling.hour
+        data = real_scheduling_repository.find_scheduling_by_date_and_hour_and_user(
+            date=mock_scheduling.date, hour=mock_scheduling.hour, user_id=mock_user.id
         )
         assert data is not None
         assert data.id == mock_scheduling.id
@@ -135,7 +134,7 @@ class TestScheulingRepository:
         self,
         real_scheduling_repository: SchedulingReposistory,
         mock_scheduling: Scheduling,
-        mock_scheduling_update: scheduling_dto.Scheduling,
+        mock_scheduling_update: SchedulingDTO,
         mock_user: User,
     ):
         real_scheduling_repository.session.add(mock_scheduling)

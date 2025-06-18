@@ -1,6 +1,6 @@
 import datetime
 from unittest.mock import MagicMock
-from api.models.dto import scheduling_dto
+from api.models.dto.scheduling_dto import SchedulingCreateDto, SchedulingDTO
 from api.models.scheduling import Scheduling
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
@@ -64,7 +64,7 @@ def mock_scheduling(mock_user):
 
 @pytest.fixture
 def mock_scheduling_create():
-    return scheduling_dto.Scheduling(
+    return SchedulingCreateDto(
         hour=12,
         date=datetime.datetime(2030, 6, 16, 0, 0),
         name="test",
@@ -75,7 +75,7 @@ def mock_scheduling_create():
 
 @pytest.fixture
 def mock_scheduling_update():
-    return scheduling_dto.Scheduling(
+    return SchedulingDTO(
         hour=16,
         date=datetime.datetime(2040, 5, 10, 0, 0),
         name="test",

@@ -1,10 +1,9 @@
-from pydantic import BaseModel, field_validator, ValidationError, model_validator
-from api.exceptions import scheduling_exceptions
+from pydantic import BaseModel
 
-from datetime import date, datetime
+from datetime import datetime
 
 
-class Scheduling(BaseModel):
+class SchedulingDTO(BaseModel):
     date: datetime
     hour: int
     name: str
@@ -13,7 +12,7 @@ class Scheduling(BaseModel):
 
 
 class SchedulingCreateDto(BaseModel):
-    date: date
+    date: datetime
     hour: int
     name: str
     user_id: int

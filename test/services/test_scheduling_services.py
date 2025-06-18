@@ -1,11 +1,9 @@
 import re
 from unittest.mock import Mock
 
-from fastapi import responses
-from api.models.dto import scheduling_dto
+from api.models.dto.scheduling_dto import SchedulingDTO
 from api.models.scheduling import Scheduling
 from api.models.user import User
-from api.repository.scheduling_repository import SchedulingReposistory
 from api.services.scheduling_services import SchedulingService
 from test.mocks.scheduling import (
     mock_scheduling_create,
@@ -19,16 +17,16 @@ from test.mocks.scheduling import (
 from test.mocks.user import mock_user_repository, mock_user
 
 
-class TestScheulingServices:
+class TestSchedulingServices:
     def test_create_scheduling(
         self,
         mock_scheduling_services: SchedulingService,
         mock_scheduling_repository: Mock,
         mock_user_repository: Mock,
         mock_scheduling: Scheduling,
-        mock_scheduling_create: scheduling_dto.Scheduling,
+        mock_scheduling_create: SchedulingDTO,
     ):
-        mock_scheduling_repository.find_scheduling_by_date_and_hour.return_value = None
+        mock_scheduling_repository.find_scheduling_by_date_and_hour_and_user.return_value = None
         mock_user_repository.get_user.return_value = mock_user
         mock_scheduling_repository.create.return_value = mock_scheduling
 
@@ -101,7 +99,7 @@ class TestScheulingServices:
         mock_scheduling_repository: Mock,
         mock_scheduling_services: SchedulingService,
         mock_scheduling: Scheduling,
-        mock_scheduling_update: scheduling_dto.Scheduling,
+        mock_scheduling_update: SchedulingDTO,
     ):
         mock_scheduling_repository.find_one_scheduling.return_value = mock_scheduling
         mock_scheduling_repository.update_scheduling.return_value = (

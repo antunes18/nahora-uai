@@ -10,6 +10,7 @@ from api.models import scheduling
 from api.models.enums.type import MsgReturn
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
+from api.services import scheduling_services
 from api.services.scheduling_services import SchedulingService as services
 from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto
 
@@ -70,6 +71,7 @@ def create_Scheduling(
             "description": "Lista de Schedulings",
         }
     },
+    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def get_all_scheduling(
@@ -78,6 +80,7 @@ def get_all_scheduling(
     scheduling_services: services = Depends(get_scheduling_services),
 ):
     return scheduling_services.get_all_schedulings(skip, limit)
+
 
 @router.get(
     "/user/{user_id}",
@@ -88,7 +91,9 @@ def get_all_scheduling(
             "model": List[SchedulingDTO],
             "description": "Lista de Schedulings do usuario",
         }
-    }
+    },
+    status_code=200,
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_schedulings_by_user(
     user_id: int,
@@ -96,8 +101,8 @@ def get_all_schedulings_by_user(
     limit: int = 10,
     scheduling_services: services = Depends(get_scheduling_services),
 ):
-    print("aaaaaaaaaaaa")
     return scheduling_services.get_all_schedulings_by_user(skip, limit, user_id)
+
 
 @router.get(
     "/{scheduling_id}",
@@ -113,6 +118,7 @@ def get_all_schedulings_by_user(
             "description": "Scheduling Não Encontrado",
         },
     },
+    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def get_one_scheduling(
@@ -140,6 +146,7 @@ def get_one_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
+    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def delete_scheduling(
@@ -167,6 +174,7 @@ def delete_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
+    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def restore_scheduling(
@@ -194,6 +202,7 @@ def restore_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
+    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def update_scheduling(
