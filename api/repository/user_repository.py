@@ -18,7 +18,8 @@ class UserRepository:
 
     def get_all_users(self, skip: int, limit: int) -> list[User]:
         result = self.session.execute(
-            select(User).filter(User.disabled == False).offset(skip).limit(limit)
+            select(User).filter(User.disabled ==
+                                False).offset(skip).limit(limit)
         )
         return list(result.scalars().all())
 
@@ -39,7 +40,7 @@ class UserRepository:
         return self.session.query(User).filter(User.number == phone_number).first()
 
     def update_user(self, db_user: User, user: User) -> User:
-        for key, value in user.dict(exclude_unset=True).items():
+        for key, value in user.model_dump(exclude_unset=True).items():
             setattr(db_user, key, value)
 
         self.session.commit()
