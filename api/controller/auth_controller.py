@@ -52,9 +52,10 @@ def sign_up(
 
 @router.post(
     "/signin",
+    status_code=200,
     response_model=Token,
     responses={
-        201: {
+        200: {
             "model": UserResponseDTO,
             "description": "Login Realizado!",
         },
