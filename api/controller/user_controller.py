@@ -39,6 +39,8 @@ def get_user_services(
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
+    status_code=200,
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_users(
     skip: int = 0,
@@ -64,6 +66,7 @@ def get_all_users(
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
     status_code=200,
+    dependencies=[Depends(JwtBearer())],
 )
 def get_user(user_id: int, user_services: services = Depends(get_user_services)):
     return user_services.get_user(user_id)

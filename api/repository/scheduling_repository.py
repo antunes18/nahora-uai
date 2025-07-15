@@ -1,7 +1,7 @@
 import datetime
 
 from sqlalchemy.orm import Session
-from sqlalchemy import extract # Import extract
+from sqlalchemy import extract  # Import extract
 
 from api.models.scheduling import Scheduling
 
@@ -16,16 +16,17 @@ class SchedulingReposistory:
         self.session.refresh(scheduling)
         return scheduling
 
-    def find_scheduling_by_date_and_hour( # Renamed function
-        self, date: datetime.date, hour: int # Changed type hint for date
+    def find_scheduling_by_date_and_hour_and_user(  # Renamed function
+        self, date: datetime.date, hour: int, user_id: int
     ) -> Scheduling | None:
         return (
             self.session.query(Scheduling)
             .filter(
-                extract('year', Scheduling.date) == date.year,
-                extract('month', Scheduling.date) == date.month,
-                extract('day', Scheduling.date) == date.day,
+                extract("year", Scheduling.date) == date.year,
+                extract("month", Scheduling.date) == date.month,
+                extract("day", Scheduling.date) == date.day,
                 Scheduling.hour == hour,
+                Scheduling.user_id == user_id,
                 Scheduling.is_deleted == False,
             )
             .first()
@@ -35,6 +36,15 @@ class SchedulingReposistory:
         return (
             self.session.query(Scheduling)
             .filter(Scheduling.is_deleted == False)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def find_all_by_user(self, skip: int, limit: int, user_id: int) -> list:
+        return (
+            self.session.query(Scheduling)
+            .filter(Scheduling.is_deleted == False, Scheduling.user_id == user_id)
             .offset(skip)
             .limit(limit)
             .all()
@@ -66,10 +76,6 @@ class SchedulingReposistory:
     def update_scheduling(self, id: int, scheduling: Scheduling) -> Scheduling | None:
         model = self.find_one_scheduling(id)
         if model:
-            model.hour = scheduling.hour
-            model.date = scheduling.date
-            model.name = scheduling.name
-            model.phone = scheduling.phone
             self.session.commit()
             self.session.refresh(model)
             return model

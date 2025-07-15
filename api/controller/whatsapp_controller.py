@@ -116,3 +116,4 @@ def send_audio(number: str, audio_url: str):
         )
 
     return JSONResponse(status_code=201, content="Audio Enviado")
+
