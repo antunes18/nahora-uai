@@ -31,7 +31,6 @@ class UserResponseDTO(BaseModel):
     number: int
     role: str
     disabled: bool
-    access_token: str = None
 
     class Config:
         from_attributes = True

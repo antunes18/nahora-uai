@@ -52,6 +52,7 @@ def get_all_users(
 
 @router.get(
     "/{user_id}",
+    status_code=200,
     response_model=UserResponseDTO,
     response_model_exclude_unset=True,
     responses={
@@ -65,7 +66,6 @@ def get_all_users(
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def get_user(user_id: int, user_services: services = Depends(get_user_services)):
@@ -74,6 +74,7 @@ def get_user(user_id: int, user_services: services = Depends(get_user_services))
 
 @router.put(
     "/{user_id}",
+    status_code=204,
     response_model_exclude_unset=True,
     responses={
         204: {
@@ -85,7 +86,6 @@ def get_user(user_id: int, user_services: services = Depends(get_user_services))
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    status_code=204,
     dependencies=[Depends(JwtBearer())],
 )
 def update_user(
@@ -98,6 +98,7 @@ def update_user(
 
 @router.delete(
     "/{user_id}",
+    status_code=204,
     response_model_exclude_unset=True,
     responses={
         204: {
@@ -109,7 +110,6 @@ def update_user(
         },
         500: {"model": GenericError, "description": "Error no Servidor!"},
     },
-    status_code=204,
     dependencies=[Depends(JwtBearer())],
 )
 def delete_user(user_id: int, user_services: services = Depends(get_user_services)):
@@ -118,11 +118,10 @@ def delete_user(user_id: int, user_services: services = Depends(get_user_service
 
 @router.put(
     "/restore/{user_id}",
-    response_model=UserResponseDTO,
+    status_code=204,
     response_model_exclude_unset=True,
     responses={
-        201: {
-            "model": UserResponseDTO,
+        204: {
             "description": "Usuário Restaurado",
         },
         404: {
@@ -131,7 +130,6 @@ def delete_user(user_id: int, user_services: services = Depends(get_user_service
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    status_code=201,
     dependencies=[Depends(JwtBearer())],
 )
 def restore_user(user_id: int, user_services: services = Depends(get_user_services)):

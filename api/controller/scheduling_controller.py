@@ -1,33 +1,16 @@
 from typing import List
 from api.core.response_message import ResponseMessage
 from fastapi import APIRouter, HTTPException, Depends, status
-from sqlalchemy.orm import Session
 from api.core.jwt_bearer import JwtBearer
-from api.core.database import get_db
 from api.exceptions.message import GenericError
 from api.exceptions import scheduling_exceptions  # Import scheduling_exceptions
-from api.repository.scheduling_repository import SchedulingReposistory
-from api.repository.user_repository import UserRepository
 from api.services.scheduling_services import SchedulingService as services
 from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto
 
+from api.core.dependecies import get_user_repo, get_scheduling_repo, get_scheduling_services
+
 
 router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
-
-
-def get_scheduling_repo(db: Session = Depends(get_db)) -> SchedulingReposistory:
-    return SchedulingReposistory(session=db)
-
-
-def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
-    return UserRepository(session=db)
-
-
-def get_scheduling_services(
-    user_repo: UserRepository = Depends(get_user_repo),
-    scheduling_repo: SchedulingReposistory = Depends(get_scheduling_repo),
-) -> services:
-    return services(scheduling_repo=scheduling_repo, user_repo=user_repo)
 
 
 @router.post(
@@ -60,6 +43,7 @@ def create_Scheduling(
 
 @router.get(
     "/",
+    status_code=200,
     response_model=List[SchedulingDTO],
     response_model_exclude_unset=True,
     responses={
@@ -68,7 +52,6 @@ def create_Scheduling(
             "description": "Lista de Schedulings",
         }
     },
-    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def get_all_scheduling(
@@ -81,6 +64,7 @@ def get_all_scheduling(
 
 @router.get(
     "/user/{user_id}",
+    status_code=200,
     response_model=List[SchedulingDTO],
     response_model_exclude_unset=True,
     responses={
@@ -89,7 +73,6 @@ def get_all_scheduling(
             "description": "Lista de Schedulings do usuario",
         }
     },
-    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def get_all_schedulings_by_user(
@@ -103,6 +86,7 @@ def get_all_schedulings_by_user(
 
 @router.get(
     "/{scheduling_id}",
+    status_code=200,
     response_model=SchedulingDTO,
     response_model_exclude_unset=True,
     responses={
@@ -115,7 +99,6 @@ def get_all_schedulings_by_user(
             "description": "Scheduling Não Encontrado",
         },
     },
-    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def get_one_scheduling(
@@ -124,13 +107,16 @@ def get_one_scheduling(
     try:
         return scheduling_services.get_scheduling(scheduling_id)
     except scheduling_exceptions.NotFound as e:  # Catch specific exception first
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.delete(
     "/delete/{scheduling_id}",
+    status_code=200,
     response_model=ResponseMessage,
     response_model_exclude_unset=True,
     responses={
@@ -143,7 +129,6 @@ def get_one_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def delete_scheduling(
@@ -152,13 +137,16 @@ def delete_scheduling(
     try:
         return scheduling_services.delete_scheduling(scheduling_id)
     except scheduling_exceptions.NotFound as e:  # Catch specific exception first
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.put(
     "/restore/{scheduling_id}",
+    status_code=200,
     response_model=ResponseMessage,
     response_model_exclude_unset=True,
     responses={
@@ -171,7 +159,6 @@ def delete_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def restore_scheduling(
@@ -180,13 +167,16 @@ def restore_scheduling(
     try:
         return scheduling_services.restore_scheduling(scheduling_id)
     except scheduling_exceptions.NotFound as e:  # Catch specific exception first
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 @router.put(
     "/update/{scheduling_id}",
+    status_code=200,
     response_model=SchedulingDTO,
     response_model_exclude_unset=True,
     responses={
@@ -199,7 +189,6 @@ def restore_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    status_code=200,
     dependencies=[Depends(JwtBearer())],
 )
 def update_scheduling(
@@ -210,6 +199,8 @@ def update_scheduling(
     try:
         return scheduling_services.update_scheduling(scheduling_id, scheduling)
     except scheduling_exceptions.NotFound as e:  # Catch specific exception first
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

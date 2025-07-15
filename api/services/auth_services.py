@@ -1,8 +1,7 @@
 from api.core import auth
 from sqlalchemy.orm import Session
 from api.exceptions import user_exceptions
-from api.models.dto.user_dto import UserCreateDTO, UserResponseDTO, UserLoginDTO
-
+from api.models.dto.user_dto import UserCreateDTO, UserResponseDTO, UserLoginDTO, UserUpdateDTO
 from api.repository.user_repository import UserRepository
 from api.models.user import User
 from api.core.auth import Token
@@ -33,7 +32,8 @@ class UserServices:
         return self.user_repo.create_user(user)
 
     def login(self, user_login: UserLoginDTO) -> Token:
-        user_data: UserResponseDTO = self.user_repo.get_user_by_email(user_login.email)
+        user_data: UserResponseDTO = self.user_repo.get_user_by_email(
+            user_login.email)
 
         if not user_data:
             raise user_exceptions.UserNotFound()
@@ -54,7 +54,7 @@ class UserServices:
     def get_user_by_email(self, email: str):
         return self.user_repo.get_user_by_email(email)
 
-    def update_user(self, user_id: int, update_user: User):
+    def update_user(self, user_id: int, update_user: UserUpdateDTO):
         user = self.user_repo.get_user(user_id)
         if user is None:
             raise UserNotFound()
