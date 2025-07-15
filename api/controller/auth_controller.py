@@ -10,18 +10,10 @@ from api.models.dto.user_dto import (
     UserResponseDTO,
 )
 from api.exceptions.message import GenericError
+from api.core.dependecies import get_user_repo, get_user_services
+
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
-
-
-def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
-    return UserRepository(session=db)
-
-
-def get_user_services(
-    user_repo: UserRepository = Depends(get_user_repo),
-) -> services:
-    return services(user_repo=user_repo)
 
 
 @router.post(

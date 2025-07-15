@@ -1,33 +1,16 @@
 from typing import List
 from api.core.response_message import ResponseMessage
 from fastapi import APIRouter, HTTPException, Depends, status
-from sqlalchemy.orm import Session
 from api.core.jwt_bearer import JwtBearer
-from api.core.database import get_db
 from api.exceptions.message import GenericError
 from api.exceptions import scheduling_exceptions  # Import scheduling_exceptions
-from api.repository.scheduling_repository import SchedulingReposistory
-from api.repository.user_repository import UserRepository
 from api.services.scheduling_services import SchedulingService as services
 from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto
 
+from api.core.dependecies import get_user_repo, get_scheduling_repo, get_scheduling_services
+
 
 router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
-
-
-def get_scheduling_repo(db: Session = Depends(get_db)) -> SchedulingReposistory:
-    return SchedulingReposistory(session=db)
-
-
-def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
-    return UserRepository(session=db)
-
-
-def get_scheduling_services(
-    user_repo: UserRepository = Depends(get_user_repo),
-    scheduling_repo: SchedulingReposistory = Depends(get_scheduling_repo),
-) -> services:
-    return services(scheduling_repo=scheduling_repo, user_repo=user_repo)
 
 
 @router.post(
