@@ -10,7 +10,7 @@ from api.core.database import Base, get_db
 from api.core.main import app
 
 # Usando SQLite em memória para testes
-SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///teste.db:memory:"
+SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///test.db"
 
 # Engine síncrono
 engine = create_engine(
