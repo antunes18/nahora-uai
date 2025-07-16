@@ -39,7 +39,8 @@ def sign(user_data: UserResponseDTO) -> str:
 
 def decode(token: str):
     try:
-        decode_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        decode_token = jwt.decode(
+            token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return decode_token if decode_token["exp"] >= time() else None
 
     except:
