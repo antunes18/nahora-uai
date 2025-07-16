@@ -27,5 +27,5 @@ jobs:
     - name: Run tests
       env:
         PYTHONPATH: ${{ github.workspace }}
-        DB_URL: ${{ env.DB_URL }}
+        DB_URL: ${{ secrets.DB_URL }}
       run: pytest -W ignore::DeprecationWarning 
