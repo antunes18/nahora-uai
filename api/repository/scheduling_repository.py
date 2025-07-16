@@ -76,6 +76,11 @@ class SchedulingReposistory:
     def update_scheduling(self, id: int, scheduling: Scheduling) -> Scheduling | None:
         model = self.find_one_scheduling(id)
         if model:
+            model.name = scheduling.name
+            model.phone = scheduling.phone
+            model.date = scheduling.date
+            model.hour = scheduling.hour
+
             self.session.commit()
             self.session.refresh(model)
             return model

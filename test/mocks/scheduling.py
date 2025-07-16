@@ -76,6 +76,7 @@ def mock_scheduling_create():
 @pytest.fixture
 def mock_scheduling_update():
     return SchedulingDTO(
+        id=1,
         hour=16,
         date=datetime.datetime(2040, 5, 10, 0, 0),
         name="test",
