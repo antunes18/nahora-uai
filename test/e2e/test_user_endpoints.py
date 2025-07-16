@@ -47,9 +47,9 @@ def test_user(db_session_for_test: Session) -> User:
 @pytest.fixture
 def user_update_json():
     return ({
-        "username":         "update_user",
-        "number":           "1234567891234",
-        "password":         "stringupdate",
+        "username": "update_user",
+        "number": "1234567891234",
+        "password": "stringupdate",
         "confirm_password": "stringupdate",
 
     })
