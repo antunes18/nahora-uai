@@ -28,4 +28,8 @@ jobs:
       env:
         PYTHONPATH: ${{ github.workspace }}
         DB_URL: ${{ secrets.DB_URL }}
+        JWT_SECRETS: ${{secrets.JWT_SECRETS}}
+        JWT_ALGORITHM: ${{secrets.JWT_ALGORITHM}}
+        TOKEN_EXPIRE: ${{secrets.TOKEN_EXPIRE}}
+        
       run: pytest -W ignore::DeprecationWarning 
