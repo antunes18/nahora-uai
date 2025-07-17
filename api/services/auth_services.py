@@ -56,13 +56,13 @@ class UserServices:
 
     def update_user(self, user_id: int, update_user: UserUpdateDTO):
         user = self.user_repo.get_user(user_id)
-        if user is None:
+        if user is None and user.disabled is True:
             raise UserNotFound()
 
-        if self.user_repo.get_user_by_username(update_user.username):
+        if self.user_repo.get_user_by_username(update_user.username) and user.username != update_user.username:
             raise user_exceptions.UserInvalidUsername()
 
-        if self.user_repo.get_user_by_phone_number(update_user.number):
+        if self.user_repo.get_user_by_phone_number(update_user.number and user.number != update_user.number):
             raise user_exceptions.UserPhoneNumberAlreadyUsed
 
         return self.user_repo.update_user(user, update_user)

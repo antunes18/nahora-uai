@@ -169,5 +169,5 @@ cython_debug/
 .idea/
 
 *.db
-
+test.db
 # End of https://www.toptal.com/developers/gitignore/api/flask

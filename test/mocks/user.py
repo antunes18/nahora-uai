@@ -25,7 +25,7 @@ def real_user_repository(db_session_for_test: Session):
     return UserRepository(session=db_session_for_test)
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def real_users_services(user_repository: UserRepository):
     """Fixture que fornece uma instância do UserService com um repositório real (para testes de integração)."""
     return UserServices(user_repo=user_repository)
