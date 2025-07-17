@@ -5,7 +5,14 @@ from datetime import datetime
 
 
 class SchedulingDTO(BaseModel):
-    id: int
+    date: datetime
+    hour: int
+    name: str
+    user_id: int
+    phone: str
+
+
+class SchedulingResponseDTO(BaseModel):
     date: datetime
     hour: int
     name: str
@@ -14,6 +21,15 @@ class SchedulingDTO(BaseModel):
 
 
 class SchedulingCreateDto(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    date: datetime
+    hour: int
+    name: str
+    user_id: int
+    phone: str
+
+
+class SchedulingUpdateDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     date: datetime
     hour: int

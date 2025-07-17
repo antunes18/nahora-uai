@@ -68,18 +68,18 @@ class SchedulingService:
     def get_scheduling(self, scheduling_id: int):
         scheduling = self.scheduling_repo.find_one_scheduling(scheduling_id)
 
-        if scheduling:
-            return scheduling
-        else:
+        if not scheduling or scheduling.is_deleted is True:
             raise scheduling_exceptions.NotFound()
+
+        return scheduling
 
     def delete_scheduling(self, scheduling_id: int):
         scheduling = self.scheduling_repo.delete_scheduling(scheduling_id)
 
-        if scheduling:
-            return {"message": "book deleted"}
-        else:
+        if not scheduling and scheduling.is_deleted is True:
             raise scheduling_exceptions.NotFound()
+
+        return {"message": "book deleted"}
 
     def restore_scheduling(self, scheduling_id: int):
         scheduling = self.scheduling_repo.restore_scheduling(scheduling_id)
@@ -92,7 +92,8 @@ class SchedulingService:
     def update_scheduling(
         self, scheduling_id: int, scheduling_dto: SchedulingDTO
     ):  # Parameter renamed
-        existing_scheduling = self.scheduling_repo.find_one_scheduling(scheduling_id)
+        existing_scheduling = self.scheduling_repo.find_one_scheduling(
+            scheduling_id)
 
         self.validate_scheduling(scheduling_dto)
 

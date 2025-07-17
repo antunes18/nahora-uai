@@ -55,7 +55,7 @@ def user_update_json():
     })
 
 
-class Test_User_Endpoint:
+class Test_User_E2E:
     def test_get_all_users(self, client, test_user, auth_header):
         """
         Tests the GET /user/ endpoint to retrieve all users.
@@ -98,11 +98,22 @@ class Test_User_Endpoint:
         response = client.put(
             "/user/1", headers=auth_header, json=user_update_json
         )
-        assert response.status_code == 200
-        assert response.json() is not None
+        assert response.status_code == 204
 
-        assert response.json()["email"] == "teste1@teste.com"
-        assert response.json()["username"] == "update_user"
-        assert response.json()["number"] == "1234567891233"
+        result = client.get(
+            "user/1", headers=auth_header
+        )
 
+        assert result.json() is not None
+
+        assert result.json()["email"] == "teste1@teste.com"
+        assert result.json()["username"] == "update_user"
+        assert result.json()["number"] == int("1234567891234")
+
+        app.dependency_overrides.clear()
+
+    def test_user_delete_e2e(self, client, test_user, auth_header):
+        response = client.delete("/user/1", headers=auth_header)
+
+        assert response.status_code == 204
         app.dependency_overrides.clear()
