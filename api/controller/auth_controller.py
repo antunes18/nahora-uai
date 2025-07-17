@@ -18,6 +18,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post(
     "/signup",
+    status_code=201,
     response_model=UserResponseDTO,
     response_model_exclude_unset=True,
     responses={
