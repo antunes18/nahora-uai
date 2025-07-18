@@ -19,13 +19,13 @@ class UserServices:
         if self.user_repo.get_user_by_username(user.username):
             raise user_exceptions.UserInvalidUsername()
 
-        if self.user_repo.get_user_by_phone_number(user.number):
-            raise user_exceptions.UserPhoneNumberAlreadyUsed()
+        if self.user_repo.get_user_by_phone_number(user.phone):
+            raise user_exceptions.UserPhonephoneAlreadyUsed()
 
         user = User(
             username=user.username,
             email=user.email,
-            number=user.number,
+            phone=user.phone,
             password=auth.hash_password(user.password),
             disabled=False,
         )
@@ -62,19 +62,21 @@ class UserServices:
         if self.user_repo.get_user_by_username(update_user.username) and user.username != update_user.username:
             raise user_exceptions.UserInvalidUsername()
 
-        if self.user_repo.get_user_by_phone_number(update_user.number and user.number != update_user.number):
-            raise user_exceptions.UserPhoneNumberAlreadyUsed
+        if self.user_repo.get_user_by_phone_number(update_user.phone) and user.phone != update_user.phone:
+            raise user_exceptions.UserPhoneNumberAlreadyUsed()
 
         return self.user_repo.update_user(user, update_user)
 
-    def delete_user(self, user_id: int):
+    def delete_user(self, user_id:
+                    int):
         user = self.user_repo.get_user(user_id)
         if user is None:
             raise UserNotFound()
 
         return self.user_repo.disable_user(user)
 
-    def restore_user(self, user_id: int):
+    def restore_user(self, user_id:
+                     int):
         user = self.user_repo.get_user(user_id)
         if user is None:
             raise UserNotFound()

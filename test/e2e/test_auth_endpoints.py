@@ -23,7 +23,7 @@ class Test_Auth_E2E:
 
         assert response.json()["username"] == "teste_de_user1"
         assert response.json()["email"] == "teste1@teste.com"
-        assert response.json()["number"] == int("1234567891234")
+        assert response.json()["phone"] == "1234567891234"
         assert response.json()["role"] == "user"
         assert response.json()["disabled"] is False
 

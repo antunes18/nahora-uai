@@ -33,7 +33,7 @@ class TestUserServices:
         assert response is not None
         assert response.email == "teste@teste.com"
         assert response.username == "teste_de_user"
-        assert response.number == "1234567891234"
+        assert response.phone == "1234567891234"
         assert response.role == "user"
         assert response.disabled == False
 
