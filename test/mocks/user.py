@@ -1,6 +1,9 @@
 from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.orm import Session
+
+from api.core.auth import hash_password
+
 from api.models.user import User
 from api.models.dto.user_dto import UserCreateDTO, UserLoginDTO, UserUpdateDTO
 from api.models.enums.roles import Roles
@@ -126,3 +129,48 @@ def mock_list_user():
             disabled=False,
         ),
     ]
+
+
+@pytest.fixture(scope="function")
+def test_user(db_session_for_test: Session) -> User:
+    """
+    Cria um utilizador na base de dados para fins de teste.
+    """
+
+    password = hash_password("stringstri")
+
+    user = User(
+        username="teste_de_user1",
+        email="teste1@teste.com",
+        password="",
+        number="1234567891234",
+        role="user",
+        disabled=False,
+    )
+
+    user.password = password
+
+    db_session_for_test.add(user)
+    db_session_for_test.commit()
+
+    return user
+
+
+@pytest.fixture
+def new_user_json():
+    return ({
+        "username": "teste_de_user1",
+        "email": "teste1@teste.com",
+        "number": "1234567891234",
+        "password": "stringstri",
+        "confirm_password": "stringstri",
+
+    })
+
+
+@pytest.fixture
+def login_user_json():
+    return ({
+        "email": "teste1@teste.com",
+        "password": "stringstri",
+    })
