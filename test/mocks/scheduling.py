@@ -1,7 +1,11 @@
 import datetime
 from unittest.mock import MagicMock
+
 from api.models.dto.scheduling_dto import SchedulingCreateDto, SchedulingDTO
+
 from api.models.scheduling import Scheduling
+from api.models.user import User
+
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
 from api.services.scheduling_services import SchedulingService
@@ -125,3 +129,40 @@ def mock_scheduling_list(mock_user):
             is_deleted=False,
         ),
     ]
+
+
+@pytest.fixture()
+def test_scheduling(db_session_for_test: Session, mock_scheduling_list, mock_user: User):
+    """
+    Cria um utilizador na base de dados para fins de teste.
+    """
+
+    for scheduling in mock_scheduling_list:
+        db_session_for_test.add(scheduling)
+        db_session_for_test.commit()
+
+    return mock_scheduling_list
+
+
+@pytest.fixture
+def create_scheduling_json():
+    return ({
+        "date": "2030-07-16T23:15:36.736Z",
+        "hour": 16,
+        "name": "client_username",
+        "user_id": 1,
+        "phone": "1234567891231"
+
+    })
+
+
+@pytest.fixture
+def update_scheduling_json():
+    return ({
+        "date": "2030-07-16T23:15:36.736Z",
+        "hour": 18,
+        "name": "update_client_username",
+        "user_id": 1,
+        "phone": "1234567891231"
+
+    })

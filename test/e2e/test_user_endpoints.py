@@ -22,7 +22,7 @@ def test_user(db_session_for_test: Session) -> User:
         User(
             username="teste_de_user1",
             email="teste1@teste.com",
-            number="1234567891234",
+            phone="1234567891234",
             password="stringstri",
             role="user",
             disabled=False,
@@ -30,7 +30,7 @@ def test_user(db_session_for_test: Session) -> User:
         User(
             username="teste_de_user2",
             email="teste2@teste.com",
-            number="9876543210111",
+            phone="9876543210111",
             password="stringstri",
             role="user",
             disabled=False,
@@ -48,7 +48,7 @@ def test_user(db_session_for_test: Session) -> User:
 def user_update_json():
     return ({
         "username": "update_user",
-        "number": "1234567891234",
+        "phone": "1234567891234",
         "password": "stringupdate",
         "confirm_password": "stringupdate",
 
@@ -108,7 +108,7 @@ class Test_User_E2E:
 
         assert result.json()["email"] == "teste1@teste.com"
         assert result.json()["username"] == "update_user"
-        assert result.json()["number"] == int("1234567891234")
+        assert result.json()["phone"] == "1234567891234"
 
         app.dependency_overrides.clear()
 

@@ -20,7 +20,7 @@ class TestUserRepository:
         assert data is not None
         assert data.email == mock_user_create.email
         assert data.username == mock_user_create.username
-        assert data.number == mock_user_create.number
+        assert data.phone == mock_user_create.phone
         assert data.role == mock_user_create.role
         assert data.disabled == mock_user_create.disabled
 
@@ -57,7 +57,7 @@ class TestUserRepository:
         assert data is not None
         assert data.email == mock_user.email
         assert data.username == mock_user.username
-        assert data.number == mock_user.number
+        assert data.phone == mock_user.phone
         assert data.role == mock_user.role
         assert data.disabled == mock_user.disabled
 
@@ -72,7 +72,7 @@ class TestUserRepository:
         assert data is not None
         assert data.email == mock_user.email
         assert data.username == mock_user.username
-        assert data.number == mock_user.number
+        assert data.phone == mock_user.phone
         assert data.role == mock_user.role
         assert data.disabled == mock_user.disabled
 
@@ -82,12 +82,12 @@ class TestUserRepository:
         real_user_repository.session.add(mock_user)
         real_user_repository.session.commit()
 
-        data = real_user_repository.get_user_by_phone_number(mock_user.number)
+        data = real_user_repository.get_user_by_phone_number(mock_user.phone)
 
         assert data is not None
         assert data.email == mock_user.email
         assert data.username == mock_user.username
-        assert data.number == mock_user.number
+        assert data.phone == mock_user.phone
         assert data.role == mock_user.role
         assert data.disabled == mock_user.disabled
 
@@ -104,7 +104,7 @@ class TestUserRepository:
 
         assert data is not None
         assert data.username == mock_user_update.username
-        assert data.number == int(mock_user_update.number)
+        assert data.phone == mock_user_update.phone
 
     def test_delete_user(self, real_user_repository: UserRepository, mock_user: User):
         real_user_repository.session.add(mock_user)

@@ -13,45 +13,8 @@ from api.models.user import User
 from test.mocks.user import mock_user_service, mock_user_repository, mock_user_update
 from test.mocks.mock_token_user import auth_header
 
-from test.mocks.scheduling import mock_scheduling_list
+from test.mocks.scheduling import mock_scheduling_list, test_scheduling, create_scheduling_json, update_scheduling_json
 from test.mocks.user import mock_user
-
-
-@pytest.fixture()
-def test_scheduling(db_session_for_test: Session, mock_scheduling_list, mock_user):
-    """
-    Cria um utilizador na base de dados para fins de teste.
-    """
-
-    for scheduling in mock_scheduling_list:
-        db_session_for_test.add(scheduling)
-        db_session_for_test.commit()
-
-    return mock_scheduling_list
-
-
-@pytest.fixture
-def create_scheduling():
-    return ({
-        "date": "2030-07-16T23:15:36.736Z",
-        "hour": 16,
-        "name": "client_username",
-        "user_id": 1,
-        "phone": "1234567891231"
-
-    })
-
-
-@pytest.fixture
-def update_scheduling():
-    return ({
-        "date": "2030-07-16T23:15:36.736Z",
-        "hour": 18,
-        "name": "update_client_username",
-        "user_id": 1,
-        "phone": "1234567891231"
-
-    })
 
 
 class Test_Scheduling_E2E:
@@ -74,9 +37,9 @@ class Test_Scheduling_E2E:
 
         app.dependency_overrides.clear()
 
-    def test_create_scheduling(self, client, test_scheduling, auth_header, create_scheduling):
+    def test_create_scheduling(self, client, test_scheduling, auth_header, create_scheduling_json):
         response = client.post(
-            "/scheduling/", headers=auth_header, json=create_scheduling)
+            "/scheduling/", headers=auth_header, json=create_scheduling_json)
 
         assert response.status_code == 201
         assert response.json()["hour"] == 16
@@ -86,9 +49,9 @@ class Test_Scheduling_E2E:
 
         app.dependency_overrides.clear()
 
-    def test_update_scheduling(self, client, test_scheduling, update_scheduling, auth_header):
+    def test_update_scheduling(self, client, test_scheduling, update_scheduling_json, auth_header):
         response = client.put("/scheduling/update/1",
-                              headers=auth_header, json=update_scheduling)
+                              headers=auth_header, json=update_scheduling_json)
 
         assert response.status_code == 204
 
