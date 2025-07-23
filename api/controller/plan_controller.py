@@ -1,9 +1,14 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 
 from api.core.database import get_db
+from api.core.jwt_bearer import JwtBearer
+from api.exceptions.message import GenericError
 
 from api.models.plan import Plan
+from api.models.dto.plan_dto import PlanCreateDTO, PlanUpdateDTO, PlanResponseDTO
+
 from api.repository.plan_repository import PlanRepository
 from api.services.plan_services import PlanService
 
@@ -23,74 +28,89 @@ def get_plan_services(
 
 @router.post(
     "/",
-    # response_model=,
+    response_model=PlanResponseDTO,
     response_model_exclude_unset=True,
-    status_code=200,
+    status_code=201,
     responses={
-        200: {
-            # "model": ,
-            "description": "DATA foi Criado com Sucesso!",
-        },
-        399: {
-            "model": GenericError,
-            "description": "Dados estão incorretos",
+        201: {
+            "model": PlanResponseDTO,
+            "description": "Plano foi Criado com Sucesso!",
         },
         403: {
             "model": GenericError,
-            "description": "Informação não encontrada!",
+            "description": "Usuário Não Autenticado!",
         },
+        404: {
+            "model": GenericError,
+            "description": " não encontrada!",
+        },
+
+        422: {
+            "model": GenericError,
+            "description": "Dados estão incorretos",
+        },
+
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def create(
-    obj: MODEL,
-    services: services = Depends(get_***_services),
+    obj: PlanCreateDTO,
+    services: PlanService = Depends(get_plan_services),
 ):
     return services.create(obj)
 
 
 @router.get(
     "/",
-    # response_model=[],
+    status_code=200,
+    response_model=List[PlanResponseDTO],
     response_model_exclude_unset=True,
     responses={
-        201: {
-            # "model": ,
-            "description": "Lista",
+        200: {
+            "model": List[PlanResponseDTO],
+            "description": "Lista de Planos",
         },
-        400: {
+
+        403: {
             "model": GenericError,
-            "description": "Informação Não Encontrada",
+            "description": "Usuário Não Autenticado!",
         },
-        500: {"model": GenericError, "description": "Error no Servidor"},
+
+        404: {
+            "model": GenericError,
+            "description": "Plano Não Encontrado",
+        },
+
     },
-    status_code=200,
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def get_all():
-    NotImplementedError("GET ALL NotImplemented")
+def get_all(skip: int = 0, limit: int = 100, services: PlanService = Depends(get_plan_services)):
+    return services.get_all(skip=skip, limit=limit)
 
 
 @router.get(
     "/{id}",
     status_code=200,
-    # response_model=,
+    response_model=PlanResponseDTO,
     response_model_exclude_unset=True,
     responses={
         200: {
-            # "model": ,
-            "description": "Retornar Informações da Instância",
+            "model": PlanResponseDTO,
+            "description": "Informações do Plano",
+        },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
         },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrada",
+            "description": "Plano Não Encontrada",
         },
-        500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def get_one(id: int, services: services = Depends(get_***_services)):
-    NotImplementedError("GET ONE NotImplemented")
+def get_one(id: int, services: PlanService = Depends(get_plan_services)):
+    return services.get_one(plan_id=id)
 
 
 @router.put(
@@ -101,20 +121,24 @@ def get_one(id: int, services: services = Depends(get_***_services)):
         204: {
             "description": "Dados Atualizados com Sucesso",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado",
+            "description": "Plano Não Encontrado",
         },
-        500: {"model": GenericError, "description": "Erro no Servidor"},
+
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def update(
     id: int,
-    # update_data:,
-    services: services = Depends(get_***_services),
+    update_data: PlanUpdateDTO,
+    services: PlanService = Depends(get_plan_services),
 ):
-    NotImplementedError("UPDATE NotImplemented")
+    return services.update(plan_id=id, update_plan=update_data)
 
 
 @router.delete(
@@ -125,13 +149,16 @@ def update(
         204: {
             "description": "Informação Deletada com sucesso!",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado!",
+            "description": "Plano Não Encontrado!",
         },
-        500: {"model": GenericError, "description": "Error no Servidor!"},
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def delete(id: int, services: services = Depends(get_***_services)):
-    NotImplementedError("DELETE NotImplemented")
+def delete(id: int, services: PlanService = Depends(get_plan_services)):
+    return services.delete(plan_id=id)

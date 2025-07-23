@@ -28,21 +28,25 @@ def get_tenant_services(
 
 @router.post(
     "/",
+    status_code=201,
     response_model=TenantResponseDTO,
     response_model_exclude_unset=True,
-    status_code=200,
     responses={
-        200: {
+        201: {
             "model": TenantResponseDTO,
             "description": "Tenant foi Criado com Sucesso!",
+        },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
+        404: {
+            "model": GenericError,
+            "description": "Tenant não encontrada!",
         },
         422: {
             "model": GenericError,
             "description": "Dados estão incorretos",
-        },
-        404: {
-            "model": GenericError,
-            "description": "Informação não encontrada!",
         },
     },
     # dependencies=[Depends(JwtBearer())],
@@ -56,6 +60,7 @@ def create(
 
 @router.get(
     "/",
+    status_code=200,
     response_model=List[TenantResponseDTO],
     response_model_exclude_unset=True,
     responses={
@@ -63,13 +68,15 @@ def create(
             "model": List[TenantResponseDTO],
             "description": "Lista de Tenants",
         },
-        400: {
+        403: {
             "model": GenericError,
-            "description": "Tenants Não Encontradas",
+            "description": "Usuário Não Autenticado!",
         },
-        500: {"model": GenericError, "description": "Error no Servidor"},
+        404: {
+            "model": GenericError,
+            "description": "Tenants não encontradas!",
+        }
     },
-    status_code=200,
     # dependencies=[Depends(JwtBearer())],
 )
 def get_all(skip: int = 0, limit: int = 100, service: TenantService = Depends(get_tenant_services)):
@@ -86,11 +93,14 @@ def get_all(skip: int = 0, limit: int = 100, service: TenantService = Depends(ge
             "model": TenantResponseDTO,
             "description": "Informações da Tenant",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
         404: {
             "model": GenericError,
-            "description": "Tenant Não Encontrada",
-        },
-        500: {"model": GenericError, "description": "Error no Servidor"},
+            "description": "Tenant não encontrada!",
+        }
     },
     # dependencies=[Depends(JwtBearer())],
 )
@@ -106,12 +116,15 @@ def get_one(id: int, services: TenantService = Depends(get_tenant_services)):
         204: {
             "description": "Dados Atualizados com Sucesso",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado",
-        },
-        500: {"model": GenericError, "description": "Erro no Servidor"},
-    },
+            "description": "Tenant não encontrada!",
+        }
+    }
     # dependencies=[Depends(JwtBearer())],
 )
 def update(
@@ -130,11 +143,14 @@ def update(
         204: {
             "description": "Tenant Deletada com sucesso!",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado!",
-        },
-        500: {"model": GenericError, "description": "Error no Servidor!"},
+            "description": "Tenant não encontrada!",
+        }
     },
     # dependencies=[Depends(JwtBearer())],
 )

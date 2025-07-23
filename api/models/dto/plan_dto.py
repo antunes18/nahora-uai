@@ -2,12 +2,30 @@ from pydantic import BaseModel, Field
 
 
 class PlanCreateDTO(BaseModel):
-    NotImplementedError("CreateDTO")
+    name: str = Field()
+    price: float = Field(default=0)
+    user_limit: int = Field(default=0)
+    scheduling_limit: int = Field(default=0)
+
+    class Config:
+        from_attributes = True
 
 
 class PlanResponseDTO(BaseModel):
-    NotImplementedError("ResponseDTO")
+    name: str = Field()
+    price: float = Field()
+    user_limit: int = Field(default=0)
+    scheduling_limit: int = Field(default=0)
+
+    class Config:
+        from_attributes = True
 
 
 class PlanUpdateDTO(BaseModel):
-    NotImplementedError("UpdateDTO")
+    name: str = Field()
+    price: int = Field(default=0)
+    user_limit: int = Field(default=0)
+    scheduling_limit: int = Field(default=0)
+
+    class Config:
+        from_attributes = True
