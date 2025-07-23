@@ -67,16 +67,14 @@ class UserServices:
 
         return self.user_repo.update_user(user, update_user)
 
-    def delete_user(self, user_id:
-                    int):
+    def delete_user(self, user_id: int):
         user = self.user_repo.get_user(user_id)
         if user is None:
             raise UserNotFound()
 
         return self.user_repo.disable_user(user)
 
-    def restore_user(self, user_id:
-                     int):
+    def restore_user(self, user_id: int):
         user = self.user_repo.get_user(user_id)
         if user is None:
             raise UserNotFound()
