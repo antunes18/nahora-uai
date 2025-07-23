@@ -7,19 +7,19 @@ class PlanRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def create(self, subscription: Plan) -> Plan:
-        NotImplementedError("Create Not NotImplemented")
+    def create(self, plan: Plan) -> Plan:
+        raise NotImplementedError("Create Not NotImplemented")
 
     def get_all(self) -> list(Plan):
-        NotImplementedError(
+        raise NotImplementedError(
             "GET ALL 'NEED AVALIATION OF SCOPE' not NotImplemented")
 
-    def get_one(self, subscription_id: int) -> Plan:
-        NotImplementedError("GET ONE NotImplemented")
+    def get_one(self, plan_id: int) -> Plan:
+        raise NotImplementedError("GET ONE NotImplemented")
 
-    def update(self, subscription_id: int, update_subscription: Plan):
-        NotImplementedError(
+    def update(self, plan_id: int, update_plan: Plan):
+        raise NotImplementedError(
             "UPDATE 'NEED AVALIATION OF SCOPE' not NotImplemented")
 
-    def delete(self, subscription_id: int):
-        NotImplementedError("DELETE NotImplemented")
+    def delete(self, plan_id: int):
+        raise NotImplementedError("DELETE NotImplemented")

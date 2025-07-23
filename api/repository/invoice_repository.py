@@ -10,7 +10,7 @@ class InvoiceRepository:
         self.session = session
 
     def create(self, invoice: Invoice) -> Invoice:
-        NotImplementedError("Create Not NotImplemented")
+        NotImplementedError("CREATE Not NotImplemented")
 
     def get_all(self) -> list(Invoice):
         NotImplementedError(

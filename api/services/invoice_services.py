@@ -12,16 +12,16 @@ class InvoiceService:
         self.subscription_repo = subscription_repo
 
     def create(self, dto: Invoice):
-        NotImplementedError()
+        raise NotImplementedError("CREATE Not Implemented")
 
     def get_all(self):
-        NotImplementedError()
+        raise NotImplementedError("GET ALL Not Implemented")
 
     def get_one(self, invoice_id: int):
-        NotImplementedError()
+        raise NotImplementedError(" GET ONE Not Implemented")
 
     def update(self, invoice_id: int, update_invoice: Invoice):
-        NotImplementedError()
+        raise NotImplementedError(" UPDATE Not Implemented")
 
     def delete(self, invoice_id: int):
-        NotImplementedError()
+        raise NotImplementedError(" DELETE Not Implemented")

@@ -17,16 +17,16 @@ class SubscriptionService:
         self.plan_repo = plan_repo
 
     def create(self, dto: Subscription):
-        NotImplementedError()
+        raise NotImplementedError("CREATE Not Implemented")
 
     def get_all(self):
-        NotImplementedError()
+        raise NotImplementedError("GET ALL Not Implemented")
 
     def get_one(self, subscription_id: int):
-        NotImplementedError()
+        raise NotImplementedError("GET ONE Not Implemented")
 
     def update(self, subscription_id: int, update_subscription: Subscription):
-        NotImplementedError()
+        raise NotImplementedError("UPDATE Not Implemented")
 
     def delete(self, subscription_id: int):
-        NotImplementedError()
+        raise NotImplementedError("DELETE Not Implemented")

@@ -9,16 +9,16 @@ class PlanService:
         self.plan_repo = plan_repo
 
     def create(self, dto: Plan):
-        NotImplementedError()
+        raise NotImplementedError("CREATE Not Implemented")
 
     def get_all(self):
-        NotImplementedError()
+        raise NotImplementedError("GET ALL Not Implemented")
 
     def get_one(self, plan_id: int):
-        NotImplementedError()
+        raise NotImplementedError("GET ONE Not Implemented")
 
     def update(self, plan_id: int, update_plan: Plan):
-        NotImplementedError()
+        raise NotImplementedError("UPDATE Not Implemented")
 
     def delete(self, plan_id: int):
-        NotImplementedError()
+        raise NotImplementedError("DELETE Not Implemented")
