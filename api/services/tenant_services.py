@@ -1,0 +1,63 @@
+from typing import List
+
+from api.repository.tenant_repository import TenantRepository
+from api.models.tenant import Tenant
+from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, TenantUpdateDTO
+
+
+class TenantService:
+    def __init__(
+        self, tenant_repo: TenantRepository
+    ) -> None:
+        self.tenant_repo = tenant_repo
+
+    def create(self, tenant_create_dto: TenantCreateDTO) -> Tenant:
+        if self.tenant_repo.get_by_name(tenant_create_dto.name):
+            # TODO: Implementar Exception
+            raise NotImplementedError("Error to Tenant Name Already Taken")
+
+        if self.tenant_repo.get_by_subdomain(tenant_create_dto.subdomain):
+            # TODO: Implementar Exception
+            raise NotImplementedError("Error to Tenant Already Exist")
+
+        tenant = Tenant(
+            name=tenant_create_dto.name,
+            subdomain=tenant_create_dto.subdomain,
+            logo_url=tenant_create_dto.logo_url,
+            primary_color=tenant_create_dto.primary_color,
+
+        )
+        return self.tenant_repo.create_tenant(tenant)
+
+    def get_all(self, skip: int, limit: int) -> List[Tenant]:
+        return self.tenant_repo.get_all(skip, limit)
+
+    def get_one(self, tenant_id: int) -> Tenant:
+        return self.tenant_repo.get_one(tenant_id)
+
+    def update(self, tenant_id: int, update_tenant: TenantUpdateDTO) -> None:
+        old_tenant: Tenant = self.get_one(tenant_id)
+
+        if not old_tenant:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION TO NOT FIND")
+
+        try:
+            old_tenant.name = update_tenant.name
+            old_tenant.subdomain = update_tenant.subdomain
+            old_tenant.logo_url = update_tenant.logo_url
+            old_tenant.primary_color = update_tenant.primary_color
+
+            return self.tenant_repo.update(update_tenant=old_tenant)
+        except Exception:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION ENTITY ERROR")
+
+    def delete(self, tenant_id: int) -> None:
+        tenant: Tenant = self.tenant_repo.get_one(tenant_id)
+
+        if not tenant:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION ENTITY NOT FOUND")
+
+        return self.tenant_repo.delete(tenant)
