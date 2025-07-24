@@ -13,10 +13,10 @@ class UserServices:
 
     def register_user(self, user: UserCreateDTO):
         if self.user_repo.get_user_by_email(user.email):
-            raise EntityAlreadyExists("Usuário")
+            raise EntityAlreadyExists("Usuário com esse Email")
 
         if self.user_repo.get_user_by_username(user.username):
-            raise FieldAlreadyUsed("Username")
+            raise FieldAlreadyUsed("Usuário com esse Username")
 
         if self.user_repo.get_user_by_phone_number(user.phone):
             raise FieldAlreadyUsed("Número de Telefone")
@@ -42,16 +42,26 @@ class UserServices:
 
             return Token(access_token=token)
 
-        raise InvalidData("Senha de Usuário")
+        raise InvalidData("Email ou Senha de Usuário")
 
     def get_all(self, skip: int, limit: int):
         return self.user_repo.get_all_users(skip, limit)
 
     def get_user(self, user_id: int):
-        return self.user_repo.get_user(user_id)
+        user = self.user_repo.get_user(user_id)
+
+        if not user:
+            raise EntityNotFound("User")
+
+        return user
 
     def get_user_by_email(self, email: str):
-        return self.user_repo.get_user_by_email(email)
+        user = self.user_repo.get_user_by_email(email)
+
+        if not user:
+            raise EntityNotFound("Usuário")
+
+        return user
 
     def update_user(self, user_id: int, update_user: UserUpdateDTO):
         user = self.user_repo.get_user(user_id)
@@ -59,7 +69,7 @@ class UserServices:
             raise EntityNotFound("Usuário")
 
         if self.user_repo.get_user_by_username(update_user.username) and user.username != update_user.username:
-            raise FieldAlreadyUsed("Username")
+            raise FieldAlreadyUsed("Usuário com esse Username")
 
         if self.user_repo.get_user_by_phone_number(update_user.phone) and user.phone != update_user.phone:
             raise FieldAlreadyUsed("Número de Telefone")

@@ -17,12 +17,12 @@ class SchedulingService:
     def create_scheduling(self, dto: SchedulingDTO):
         if (dto.hour < 8) or (14 > dto.hour > 12) or (dto.hour > 18):
             raise InvalidData(
-                "A hora deve estar 8 e 12 ou 14 e 18!"
+                "A hora deve estar 8 e 12 ou 14 e 18! Horário"
             )
 
         if dto.date.replace(tzinfo=None) < datetime.today():
             raise InvalidData(
-                "Não é possivel registrar para uma data anterior de hoje!"
+                "Não é possivel registrar para uma data anterior de hoje! Dia"
             )
 
         try:
@@ -31,12 +31,12 @@ class SchedulingService:
             ).replace(hour=dto.hour)
         except TypeError:
             raise InvalidData(
-                "Data ou hora inválida para o agendamento."
+                "Data ou hora"
             )
 
         if appointment_datetime < datetime.now():
             raise InvalidData(
-                "Não é possível registrar um agendamento para uma data ou hora no passado."
+                "Não é possível registrar um agendamento para uma data ou hora no passado. Dada ou Hora"
             )
 
         existing = self.scheduling_repo.find_scheduling_by_date_and_hour_and_user(
@@ -48,7 +48,7 @@ class SchedulingService:
             raise EntityAlreadyExists("Scheduling")
 
         if not user:
-            raise EntityNotFound("User")
+            raise EntityNotFound("Usuário")
 
         scheduling = Scheduling(
             hour=dto.hour,
@@ -76,7 +76,7 @@ class SchedulingService:
     def delete_scheduling(self, scheduling_id: int):
         scheduling = self.scheduling_repo.delete_scheduling(scheduling_id)
 
-        if not scheduling and scheduling.is_deleted is True:
+        if not scheduling or scheduling.is_deleted is True:
             raise EntityNotFound("Scheduling")
 
         return {"message": "book deleted"}
@@ -112,12 +112,12 @@ class SchedulingService:
     def validate_scheduling(self, dto: SchedulingDTO):
         if (dto.hour < 8) or (14 > dto.hour > 12) or (dto.hour > 18):
             raise InvalidData(
-                "A hora deve estar 8 e 12 ou 14 e 18!"
+                "A hora deve estar 8 e 12 ou 14 e 18! Horário"
             )
 
         if dto.date.replace(tzinfo=None) < datetime.today():
             raise InvalidData(
-                "Não é possivel registrar para uma data anterior de hoje!"
+                "Não é possivel registrar para uma data anterior de hoje! Data"
             )
 
         try:
@@ -126,10 +126,10 @@ class SchedulingService:
             ).replace(hour=dto.hour)
         except TypeError:
             raise InvalidData(
-                "Data ou hora inválida para o agendamento."
+                "Data ou hora inválida para o agendamento. Horário"
             )
 
         if appointment_datetime < datetime.now():
             raise InvalidData(
-                "Não é possível registrar um agendamento para uma data ou hora no passado."
+                "Não é possível registrar um agendamento para uma data ou hora no passado. Horário"
             )
