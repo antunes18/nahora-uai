@@ -1,9 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 
 from api.core.database import get_db
+from api.core.jwt_bearer import JwtBearer
+
+from api.exceptions.message import GenericError
+
 
 from api.models.invoice import Invoice
+from api.models.dto.invoice_dto import InvoiceCreateDTO, InvoiceResponseDTO, InvoiceUpdateDTO
 
 from api.repository.invoice_repository import InvoiceRepository
 from api.repository.subscription_repository import SubscriptionRepository
@@ -24,80 +30,94 @@ def get_subscription_repo(db: Session = Depends(get_db)) -> SubscriptionReposito
 
 def get_invoice_services(
     invoice_repo: InvoiceRepository = Depends(get_invoice_repo),
+    subscription_repo: SubscriptionRepository = Depends(get_subscription_repo)
 ) -> InvoiceService:
-    return InvoiceService(invoice_repo=invoice_repo)
+    return InvoiceService(invoice_repo=invoice_repo, subscription_repo=subscription_repo)
 
 
 @router.post(
     "/",
-    # response_model=,
+    status_code=201,
+    response_model=InvoiceResponseDTO,
     response_model_exclude_unset=True,
-    status_code=200,
     responses={
-        200: {
-            # "model": ,
-            "description": "DATA foi Criado com Sucesso!",
-        },
-        399: {
-            "model": GenericError,
-            "description": "Dados estão incorretos",
+        201: {
+            "model": InvoiceResponseDTO,
+            "description": "Fatura foi Criado com Sucesso!",
         },
         403: {
             "model": GenericError,
-            "description": "Informação não encontrada!",
+            "description": "Usuário Não Autenticado!",
         },
+
+        422: {
+            "model": GenericError,
+            "description": "Dados estão incorretos",
+        },
+
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def create(
-    obj: MODEL,
-    services: services = Depends(get_***_services),
+    obj: InvoiceCreateDTO,
+    services: InvoiceService = Depends(get_invoice_services),
 ):
     return services.create(obj)
 
 
 @router.get(
     "/",
-    # response_model=[],
+    status_code=200,
+    response_model=List[InvoiceResponseDTO],
     response_model_exclude_unset=True,
     responses={
-        201: {
-            # "model": ,
-            "description": "Lista",
+        200: {
+            "model": List[InvoiceResponseDTO],
+            "description": "Lista de Faturas",
         },
-        400: {
+
+        403: {
             "model": GenericError,
-            "description": "Informação Não Encontrada",
+            "description": "Usuário Não Autenticado!",
         },
-        500: {"model": GenericError, "description": "Error no Servidor"},
+
+        404: {
+            "model": GenericError,
+            "description": "Fatura Não Encontrada!",
+        },
+
     },
-    status_code=200,
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def get_all():
-    NotImplementedError("GET ALL NotImplemented")
+def get_all(skip: int = 0, limit: int = 100, services: InvoiceService = Depends(get_invoice_services)):
+    return services.get_all(skip=skip, limit=limit)
 
 
 @router.get(
     "/{id}",
     status_code=200,
-    # response_model=,
+    response_model=InvoiceResponseDTO,
     response_model_exclude_unset=True,
     responses={
         200: {
-            # "model": ,
-            "description": "Retornar Informações da Instância",
+            "model": InvoiceResponseDTO,
+            "description": "Retornar Informações da Fatura",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
+
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrada",
+            "description": "Fatura Não Encontrada!",
         },
-        500: {"model": GenericError, "description": "Error no Servidor"},
+
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def get_one(id: int, services: services = Depends(get_invoice_services)):
-    NotImplementedError("GET ONE NotImplemented")
+def get_one(id: int, services: InvoiceService = Depends(get_invoice_services)):
+    return services.get_one(invoice_id=id)
 
 
 @router.put(
@@ -108,20 +128,25 @@ def get_one(id: int, services: services = Depends(get_invoice_services)):
         204: {
             "description": "Dados Atualizados com Sucesso",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
+
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado",
+            "description": "Fatura Não Encontrada!",
         },
-        500: {"model": GenericError, "description": "Erro no Servidor"},
+
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def update(
     id: int,
-    # update_data:,
-    services: services = Depends(get_***_services),
+    update_data: InvoiceUpdateDTO,
+    services: InvoiceService = Depends(get_invoice_services),
 ):
-    NotImplementedError("UPDATE NotImplemented")
+    return services.update(invoice_id=id, update_invoice=update_data)
 
 
 @router.delete(
@@ -130,15 +155,21 @@ def update(
     response_model_exclude_unset=True,
     responses={
         204: {
-            "description": "Informação Deletada com sucesso!",
+            "description": "Fatura Deletada com sucesso!",
         },
+
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
+
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado!",
+            "description": "Fatura Não Encontrada!",
         },
-        500: {"model": GenericError, "description": "Error no Servidor!"},
+
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def delete(id: int, services: services = Depends(get_***_services)):
-    NotImplementedError("DELETE NotImplemented")
+def delete(id: int, services: InvoiceService = Depends(get_invoice_services)):
+    return services.delete(invoice_id=id)

@@ -1,13 +1,32 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 class InvoiceCreateDTO(BaseModel):
-    NotImplementedError("CreateDTO")
+    status: str = Field()
+    due_time: datetime = Field()
+    paid_date: datetime = Field()
+    subscription_id: int = Field()
+
+    class Config:
+        from_attributes = True
 
 
 class InvoiceResponseDTO(BaseModel):
-    NotImplementedError("ResponseDTO")
+    status: str = Field()
+    due_time: datetime = Field()
+    paid_date: datetime = Field()
+    subscription_id: int = Field()
+
+    class Config:
+        from_attributes = True
 
 
 class InvoiceUpdateDTO(BaseModel):
-    NotImplementedError("UpdateDTO")
+    status: str = Field()
+    due_time: datetime = Field()
+    paid_date: datetime = Field()
+    subscription_id: int = Field()
+
+    class Config:
+        from_attributes = True

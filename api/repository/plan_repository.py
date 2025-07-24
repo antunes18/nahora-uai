@@ -13,6 +13,8 @@ class PlanRepository:
         self.session.commit()
         self.session.refresh(plan)
 
+        return plan
+
     def get_all(self, skip: int, limit: int) -> List[Plan]:
         return self.session.query(Plan).offset(skip).limit(limit).all()
 

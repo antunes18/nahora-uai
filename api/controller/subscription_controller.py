@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 
 from api.core.database import get_db
+from api.exceptions.message import GenericError
 
 from api.models.subscription import Subscription
+from api.models.dto.subscription_dto import SubscriptionCreateDTO, SubscriptionResponseDTO, SubscriptionUpdateDTO
 
 from api.repository.subscription_repository import SubscriptionRepository
 from api.repository.plan_repository import PlanRepository
@@ -37,74 +40,84 @@ def get_subscription_services(
 
 @router.post(
     "/",
-    # response_model=,
+    status_code=201,
+    response_model=SubscriptionCreateDTO,
     response_model_exclude_unset=True,
-    status_code=200,
     responses={
-        200: {
-            # "model": ,
-            "description": "DATA foi Criado com Sucesso!",
-        },
-        399: {
-            "model": GenericError,
-            "description": "Dados estão incorretos",
+        201: {
+            "model": SubscriptionResponseDTO,
+            "description": "Subscription foi Criado com Sucesso!",
         },
         403: {
             "model": GenericError,
-            "description": "Informação não encontrada!",
+            "description": "Usuário Não Autenticado!",
+        },
+        404: {
+            "model": GenericError,
+            "description": "Subscription não encontrada!",
+        },
+        422: {
+            "model": GenericError,
+            "description": "Dados estão incorretos",
         },
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def create(
-    obj: MODEL,
-    services: services = Depends(get_***_services),
+    obj: SubscriptionCreateDTO,
+    services: SubscriptionService = Depends(get_subscription_services),
 ):
     return services.create(obj)
 
 
 @router.get(
     "/",
-    # response_model=[],
+    status_code=200,
+    response_model=List[SubscriptionResponseDTO],
     response_model_exclude_unset=True,
     responses={
         201: {
-            # "model": ,
-            "description": "Lista",
+            "model": List[SubscriptionResponseDTO],
+            "description": "Lista de Subscriptions",
         },
-        400: {
+        403: {
             "model": GenericError,
-            "description": "Informação Não Encontrada",
+            "description": "Usuário Não Autenticado!",
         },
-        500: {"model": GenericError, "description": "Error no Servidor"},
+        404: {
+            "model": GenericError,
+            "description": "Subscriptions não encontradas!",
+        }
     },
-    status_code=200,
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def get_all():
-    NotImplementedError("GET ALL NotImplemented")
+def get_all(skip: int = 0, limit: int = 100, services: SubscriptionService = Depends(get_subscription_services)):
+    return services.get_all(skip=skip, limit=limit)
 
 
 @router.get(
     "/{id}",
     status_code=200,
-    # response_model=,
+    response_model=SubscriptionResponseDTO,
     response_model_exclude_unset=True,
     responses={
         200: {
-            # "model": ,
-            "description": "Retornar Informações da Instância",
+            "model": SubscriptionResponseDTO,
+            "description": "Informações da Subscription",
+        },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
         },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrada",
-        },
-        500: {"model": GenericError, "description": "Error no Servidor"},
+            "description": "Subscription não encontrada!",
+        }
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def get_one(id: int, services: services = Depends(get_***_services)):
-    NotImplementedError("GET ONE NotImplemented")
+def get_one(id: int, services: SubscriptionService = Depends(get_subscription_services)):
+    return services.get_one(subscription_id=id)
 
 
 @router.put(
@@ -115,20 +128,23 @@ def get_one(id: int, services: services = Depends(get_***_services)):
         204: {
             "description": "Dados Atualizados com Sucesso",
         },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado",
-        },
-        500: {"model": GenericError, "description": "Erro no Servidor"},
-    },
-    dependencies=[Depends(JwtBearer())],
+            "description": "Tenant não encontrada!",
+        }
+    }
+    # dependencies=[Depends(JwtBearer())],
 )
 def update(
     id: int,
-    # update_data:,
-    services: services = Depends(get_***_services),
+    update_data: SubscriptionUpdateDTO,
+    services: SubscriptionService = Depends(get_subscription_services),
 ):
-    NotImplementedError("UPDATE NotImplemented")
+    return services.update(subscription_id=id, update_subscription=update_data)
 
 
 @router.delete(
@@ -137,15 +153,18 @@ def update(
     response_model_exclude_unset=True,
     responses={
         204: {
-            "description": "Informação Deletada com sucesso!",
+            "description": "Subscription Deletada com sucesso!",
+        },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
         },
         404: {
             "model": GenericError,
-            "description": "Informação Não Encontrado!",
-        },
-        500: {"model": GenericError, "description": "Error no Servidor!"},
+            "description": "Subscription não encontrada!",
+        }
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
-def delete(id: int, services: services = Depends(get_***_services)):
-    NotImplementedError("DELETE NotImplemented")
+def delete(id: int, services: SubscriptionService = Depends(get_subscription_services)):
+    return services.delete(subscription_id=id)

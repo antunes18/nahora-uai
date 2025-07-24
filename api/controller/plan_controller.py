@@ -28,9 +28,9 @@ def get_plan_services(
 
 @router.post(
     "/",
+    status_code=201,
     response_model=PlanResponseDTO,
     response_model_exclude_unset=True,
-    status_code=201,
     responses={
         201: {
             "model": PlanResponseDTO,
@@ -40,11 +40,6 @@ def get_plan_services(
             "model": GenericError,
             "description": "Usuário Não Autenticado!",
         },
-        404: {
-            "model": GenericError,
-            "description": " não encontrada!",
-        },
-
         422: {
             "model": GenericError,
             "description": "Dados estão incorretos",
