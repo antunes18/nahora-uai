@@ -20,9 +20,11 @@ class SubscriptionService:
 
     def create(self, dto: SubscriptionCreateDTO) -> Subscription:
         if not self.tenant_repo.get_one(dto.tenant_id):
+            # TODO: Implementar Exception
             raise NotImplementedError("EXCEPTION TENANT NOT EXIST")
 
         if not self.plan_repo.get_one(dto.plan_id):
+            # TODO: Implementar Exception
             raise NotImplementedError("EXCEPTION PLAN NOT EXIST")
 
         subscription: Subscription = Subscription(
@@ -42,7 +44,32 @@ class SubscriptionService:
         return self.subscription_repo.get_one(subscription_id=subscription_id)
 
     def update(self, subscription_id: int, update_subscription: Subscription) -> None:
-        return self.subscription_repo.update(subscription_id=subscription_id, update_subscription=update_subscription)
+        old_subscription: Subscription = self.subscription_repo.get_one(
+            subscription_id=subscription_id)
+
+        if not old_subscription:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION ENTITY NOT FOUND")
+
+        try:
+            old_subscription.status = update_subscription.status
+            old_subscription.start_date = update_subscription.start_date
+            old_subscription.end_date = update_subscription.end_date
+            old_subscription.tenant_id = update_subscription.tenant_id
+            old_subscription.plan_id = update_subscription.plan_id
+
+            self.subscription_repo.update(old_subscription)
+
+        except Exception:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION ENTITY NOT PROCESS")
 
     def delete(self, subscription_id: int) -> None:
-        return self.subscription_repo.delete(subscription_id=subscription_id)
+        subscription: Subscription = self.subscription_repo.get_one(
+            subscription_id)
+
+        if not subscription:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION TO ENTITY NOT FIND")
+
+        return self.subscription_repo.delete(subscription=subscription)

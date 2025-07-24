@@ -1,17 +1,14 @@
-from logging import disable
-from api.models.enums import roles
-from sqlalchemy import select
+from typing import List
+
 from sqlalchemy.orm import Session
 from api.models.tenant import Tenant
-
-from typing import List
 
 
 class TenantRepository:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def create_tenant(self, tenant: Tenant):
+    def create_tenant(self, tenant: Tenant) -> Tenant:
         self.session.add(tenant)
         self.session.commit()
         self.session.refresh(tenant)
@@ -31,24 +28,11 @@ class TenantRepository:
     def get_by_subdomain(self, subdomain: str) -> Tenant:
         return self.session.query(Tenant).filter(Tenant.subdomain == subdomain).first()
 
-    def update(self, tenant_id: int, update_tenant: Tenant) -> None:
-        old_tenant = self.get_one(tenant_id)
-        if old_tenant:
-            old_tenant.name = update_tenant.name
-            old_tenant.subdomain = update_tenant.subdomain
-            old_tenant.logo_url = update_tenant.logo_url
-            old_tenant.primary_color = update_tenant.primary_color
+    def update(self, update_tenant: Tenant) -> None:
+        self.session.commit()
+        self.session.refresh(update_tenant)
 
-            self.session.commit()
-            self.session.refresh(old_tenant)
-
-        else:
-            None
-
-    def delete(self, tenant_id: int) -> None:
-        tenant = self.get_one(tenant_id)
-        if tenant:
-            raise NotImplementedError(
-                "Função de Delete de Tenant não foi implementada")
-        else:
-            None
+    def delete(self, tenant: Tenant) -> None:
+        self.session.delete(tenant)
+        self.session.commit()
+        return None

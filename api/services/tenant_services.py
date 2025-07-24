@@ -1,3 +1,5 @@
+from typing import List
+
 from api.repository.tenant_repository import TenantRepository
 from api.models.tenant import Tenant
 from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, TenantUpdateDTO
@@ -6,14 +8,16 @@ from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, Tenant
 class TenantService:
     def __init__(
         self, tenant_repo: TenantRepository
-    ):
+    ) -> None:
         self.tenant_repo = tenant_repo
 
-    def create(self, tenant_create_dto: TenantCreateDTO):
+    def create(self, tenant_create_dto: TenantCreateDTO) -> Tenant:
         if self.tenant_repo.get_by_name(tenant_create_dto.name):
+            # TODO: Implementar Exception
             raise NotImplementedError("Error to Tenant Name Already Taken")
 
         if self.tenant_repo.get_by_subdomain(tenant_create_dto.subdomain):
+            # TODO: Implementar Exception
             raise NotImplementedError("Error to Tenant Already Exist")
 
         tenant = Tenant(
@@ -25,16 +29,35 @@ class TenantService:
         )
         return self.tenant_repo.create_tenant(tenant)
 
-    def get_all(self, skip: int, limit: int):
+    def get_all(self, skip: int, limit: int) -> List[Tenant]:
         return self.tenant_repo.get_all(skip, limit)
 
-    def get_one(self, tenant_id: int):
+    def get_one(self, tenant_id: int) -> Tenant:
         return self.tenant_repo.get_one(tenant_id)
 
-    def update(self, tenant_id: int, update_tenant: TenantUpdateDTO):
-        return self.tenant_repo.update(tenant_id, update_tenant)
+    def update(self, tenant_id: int, update_tenant: TenantUpdateDTO) -> None:
+        old_tenant: Tenant = self.get_one(tenant_id)
 
-    def delete(self, tenant_id: int):
-        # FIX: Validar regra para deletar
-        # return self.tenant_repo.delete(tenant_id)
-        raise NotImplementedError("DELETE not implemented")
+        if not old_tenant:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION TO NOT FIND")
+
+        try:
+            old_tenant.name = update_tenant.name
+            old_tenant.subdomain = update_tenant.subdomain
+            old_tenant.logo_url = update_tenant.logo_url
+            old_tenant.primary_color = update_tenant.primary_color
+
+            return self.tenant_repo.update(update_tenant=old_tenant)
+        except Exception:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION ENTITY ERROR")
+
+    def delete(self, tenant_id: int) -> None:
+        tenant: Tenant = self.tenant_repo.get_one(tenant_id)
+
+        if not tenant:
+            # TODO: Implementar Exception
+            raise NotImplementedError("EXCEPTION ENTITY NOT FOUND")
+
+        return self.tenant_repo.delete(tenant)

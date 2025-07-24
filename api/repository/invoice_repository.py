@@ -1,6 +1,3 @@
-from logging import disable
-from api.models.enums import roles
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 from api.models.invoice import Invoice
 
@@ -8,7 +5,7 @@ from typing import List
 
 
 class InvoiceRepository:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session) -> None:
         self.session = session
 
     def create(self, invoice: Invoice) -> Invoice:
@@ -24,17 +21,9 @@ class InvoiceRepository:
     def get_one(self, invoice_id: int) -> Invoice:
         return self.session.query(Invoice).filter(Invoice.id == invoice_id).first()
 
-    def update(self, invoice_id: int, update_invoice: Invoice):
-        old_invoice = self.get_one(invoice_id)
+    def update(self, update_invoice: Invoice) -> None:
+        self.session.commit()
+        self.session.refresh(update_invoice)
 
-        if old_invoice:
-            old_invoice.status = update_invoice.status
-            old_invoice.due_time = update_invoice.due_time
-            old_invoice.paid_date = update_invoice.paid_date
-            old_invoice.subscription_id = update_invoice.subscription_id
-
-            self.session.commit()
-            self.session.refresh(old_invoice)
-
-    def delete(self, invoice_id: int):
-        NotImplementedError("DELETE NotImplemented")
+    def delete(self, invoice: Invoice) -> None:
+        self.session.delete(invoice)
