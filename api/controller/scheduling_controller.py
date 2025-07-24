@@ -6,7 +6,7 @@ from api.core.database import get_db
 from api.exceptions.message import GenericError
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
-from api.services.scheduling_services import SchedulingService as services
+from api.services.scheduling_services import SchedulingService
 from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto, SchedulingUpdateDTO
 
 
@@ -24,8 +24,8 @@ def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
 def get_scheduling_services(
     user_repo: UserRepository = Depends(get_user_repo),
     scheduling_repo: SchedulingReposistory = Depends(get_scheduling_repo),
-) -> services:
-    return services(scheduling_repo=scheduling_repo, user_repo=user_repo)
+) -> SchedulingService:
+    return SchedulingService(scheduling_repo=scheduling_repo, user_repo=user_repo)
 
 
 @router.post(
@@ -51,9 +51,9 @@ def get_scheduling_services(
 )
 def create_Scheduling(
     scheduling: SchedulingCreateDto,
-    scheduling_services: services = Depends(get_scheduling_services),
+    services: SchedulingService = Depends(get_scheduling_services),
 ):
-    return scheduling_services.create_scheduling(scheduling)
+    return services.create_scheduling(scheduling)
 
 
 @router.get(
@@ -72,9 +72,9 @@ def create_Scheduling(
 def get_all_scheduling(
     skip: int = 0,
     limit: int = 10,
-    scheduling_services: services = Depends(get_scheduling_services),
+    services: SchedulingService = Depends(get_scheduling_services),
 ):
-    return scheduling_services.get_all_schedulings(skip, limit)
+    return services.get_all_schedulings(skip, limit)
 
 
 @router.get(
@@ -94,13 +94,13 @@ def get_all_schedulings_by_user(
     user_id: int,
     skip: int = 0,
     limit: int = 10,
-    scheduling_services: services = Depends(get_scheduling_services),
+    services: SchedulingService = Depends(get_scheduling_services),
 ):
-    return scheduling_services.get_all_schedulings_by_user(skip, limit, user_id)
+    return services.get_all_schedulings_by_user(skip, limit, user_id)
 
 
 @router.get(
-    "/{scheduling_id}",
+    "/{id}",
     response_model=SchedulingDTO,
     response_model_exclude_unset=True,
     status_code=200,
@@ -117,13 +117,13 @@ def get_all_schedulings_by_user(
     dependencies=[Depends(JwtBearer())],
 )
 def get_one_scheduling(
-    scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
+    id: int, services: SchedulingService = Depends(get_scheduling_services)
 ):
-    return scheduling_services.get_scheduling(scheduling_id)
+    return services.get_scheduling(id)
 
 
 @router.delete(
-    "/delete/{scheduling_id}",
+    "/delete/{id}",
     status_code=204,
     response_model_exclude_unset=True,
     responses={
@@ -138,13 +138,13 @@ def get_one_scheduling(
     dependencies=[Depends(JwtBearer())],
 )
 def delete_scheduling(
-    scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
+    id: int, services: SchedulingService = Depends(get_scheduling_services)
 ):
-    return scheduling_services.delete_scheduling(scheduling_id)
+    return services.delete_scheduling(id)
 
 
 @router.put(
-    "/restore/{scheduling_id}",
+    "/restore/{id}",
     status_code=204,
     response_model_exclude_unset=True,
     responses={
@@ -159,13 +159,13 @@ def delete_scheduling(
     dependencies=[Depends(JwtBearer())],
 )
 def restore_scheduling(
-    scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
+    id: int, services: SchedulingService = Depends(get_scheduling_services)
 ):
-    return scheduling_services.restore_scheduling(scheduling_id)
+    return services.restore_scheduling(id)
 
 
 @router.put(
-    "/update/{scheduling_id}",
+    "/update/{id}",
     status_code=204,
     response_model_exclude_unset=True,
     responses={
@@ -180,8 +180,8 @@ def restore_scheduling(
     dependencies=[Depends(JwtBearer())],
 )
 def update_scheduling(
-    scheduling_id: int,
+    id: int,
     scheduling: SchedulingUpdateDTO,
-    scheduling_services: services = Depends(get_scheduling_services),
+    services: SchedulingService = Depends(get_scheduling_services),
 ):
-    return scheduling_services.update_scheduling(scheduling_id, scheduling)
+    return services.update_scheduling(id, scheduling)

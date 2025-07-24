@@ -76,7 +76,8 @@ class TestSchedulingRepository:
         real_scheduling_repository.session.add(mock_scheduling)
         real_scheduling_repository.session.commit()
 
-        data = real_scheduling_repository.find_one_scheduling(mock_scheduling.id)
+        data = real_scheduling_repository.find_one_scheduling(
+            mock_scheduling.id)
 
         assert data is not None
         assert data.id == mock_scheduling.id
@@ -97,7 +98,7 @@ class TestSchedulingRepository:
         real_scheduling_repository.session.add(mock_scheduling)
         real_scheduling_repository.session.commit()
 
-        data = real_scheduling_repository.delete_scheduling(mock_scheduling.id)
+        data = real_scheduling_repository.delete_scheduling(mock_scheduling)
 
         assert data is not None
         assert data.id == mock_scheduling.id
@@ -118,7 +119,7 @@ class TestSchedulingRepository:
         real_scheduling_repository.session.add(mock_scheduling)
         real_scheduling_repository.session.commit()
 
-        data = real_scheduling_repository.restore_scheduling(mock_scheduling.id)
+        data = real_scheduling_repository.restore_scheduling(mock_scheduling)
 
         assert data is not None
         assert data.id == mock_scheduling.id
@@ -134,14 +135,14 @@ class TestSchedulingRepository:
         self,
         real_scheduling_repository: SchedulingReposistory,
         mock_scheduling: Scheduling,
-        mock_scheduling_update: SchedulingDTO,
+        mock_scheduling_update: Scheduling,
         mock_user: User,
     ):
         real_scheduling_repository.session.add(mock_scheduling)
         real_scheduling_repository.session.commit()
 
         data = real_scheduling_repository.update_scheduling(
-            mock_scheduling.id, mock_scheduling_update
+            mock_scheduling_update
         )
 
         assert data is not None
