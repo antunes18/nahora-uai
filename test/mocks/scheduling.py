@@ -78,14 +78,15 @@ def mock_scheduling_create():
 
 
 @pytest.fixture
-def mock_scheduling_update():
-    return SchedulingDTO(
-        id=1,
+def mock_scheduling_update(mock_user):
+    return Scheduling(
         hour=16,
-        date=datetime.datetime(2040, 5, 10, 0, 0),
+        date=datetime.datetime(2040, 5, 10),
         name="test",
-        phone="1234567891234",
+        phone=1234567891234,
         user_id=1,
+        user=mock_user,
+        is_deleted=False,
     )
 
 
