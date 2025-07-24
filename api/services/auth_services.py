@@ -1,11 +1,10 @@
 from api.core import auth
 from sqlalchemy.orm import Session
-from api.exceptions import user_exceptions
+from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, InvalidData, FieldAlreadyUsed
 from api.models.dto.user_dto import UserCreateDTO, UserResponseDTO, UserLoginDTO, UserUpdateDTO
 from api.repository.user_repository import UserRepository
 from api.models.user import User
 from api.core.auth import Token
-from api.exceptions.user_exceptions import UserNotFound
 
 
 class UserServices:
@@ -14,13 +13,13 @@ class UserServices:
 
     def register_user(self, user: UserCreateDTO):
         if self.user_repo.get_user_by_email(user.email):
-            raise user_exceptions.UserAlreadyExist()
+            raise EntityAlreadyExists("Usuário com esse Email")
 
         if self.user_repo.get_user_by_username(user.username):
-            raise user_exceptions.UserInvalidUsername()
+            raise FieldAlreadyUsed("Usuário com esse Username")
 
         if self.user_repo.get_user_by_phone_number(user.phone):
-            raise user_exceptions.UserPhonephoneAlreadyUsed()
+            raise FieldAlreadyUsed("Número de Telefone")
 
         user = User(
             username=user.username,
@@ -36,47 +35,59 @@ class UserServices:
             user_login.email)
 
         if not user_data:
-            raise user_exceptions.UserNotFound()
+            raise EntityNotFound("Usuário")
 
         if auth.verify_password(user_login.password, user_data.password):
             token = auth.sign(user_data)
 
             return Token(access_token=token)
 
-        raise user_exceptions.UserPasswordNotFind()
+        raise InvalidData("Email ou Senha de Usuário")
 
     def get_all(self, skip: int, limit: int):
         return self.user_repo.get_all_users(skip, limit)
 
     def get_user(self, user_id: int):
-        return self.user_repo.get_user(user_id)
+        user = self.user_repo.get_user(user_id)
+
+        if not user:
+            raise EntityNotFound("User")
+
+        return user
 
     def get_user_by_email(self, email: str):
-        return self.user_repo.get_user_by_email(email)
+        user = self.user_repo.get_user_by_email(email)
+
+        if not user:
+            raise EntityNotFound("Usuário")
+
+        return user
 
     def update_user(self, user_id: int, update_user: UserUpdateDTO):
         user = self.user_repo.get_user(user_id)
         if user is None and user.disabled is True:
-            raise UserNotFound()
+            raise EntityNotFound("Usuário")
 
         if self.user_repo.get_user_by_username(update_user.username) and user.username != update_user.username:
-            raise user_exceptions.UserInvalidUsername()
+            raise FieldAlreadyUsed("Usuário com esse Username")
 
         if self.user_repo.get_user_by_phone_number(update_user.phone) and user.phone != update_user.phone:
-            raise user_exceptions.UserPhoneNumberAlreadyUsed()
+            raise FieldAlreadyUsed("Número de Telefone")
 
         return self.user_repo.update_user(user, update_user)
 
-    def delete_user(self, user_id: int):
+    def delete_user(self, user_id:
+                    int):
         user = self.user_repo.get_user(user_id)
         if user is None:
-            raise UserNotFound()
+            raise EntityNotFound("Usuário")
 
         return self.user_repo.disable_user(user)
 
-    def restore_user(self, user_id: int):
+    def restore_user(self, user_id:
+                     int):
         user = self.user_repo.get_user(user_id)
         if user is None:
-            raise UserNotFound()
+            raise EntityNotFound("Usuário")
 
         return self.user_repo.enable_user(user)
