@@ -1,11 +1,9 @@
 from typing import List
-from api.core.response_message import ResponseMessage
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from api.core.jwt_bearer import JwtBearer
 from api.core.database import get_db
 from api.exceptions.message import GenericError
-from api.exceptions import scheduling_exceptions  # Import scheduling_exceptions
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
 from api.services.scheduling_services import SchedulingService as services
@@ -142,14 +140,7 @@ def get_one_scheduling(
 def delete_scheduling(
     scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
 ):
-    try:
-        return scheduling_services.delete_scheduling(scheduling_id)
-    except scheduling_exceptions.NotFound as e:  # Catch specific exception first
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return scheduling_services.delete_scheduling(scheduling_id)
 
 
 @router.put(
@@ -170,14 +161,7 @@ def delete_scheduling(
 def restore_scheduling(
     scheduling_id: int, scheduling_services: services = Depends(get_scheduling_services)
 ):
-    try:
-        return scheduling_services.restore_scheduling(scheduling_id)
-    except scheduling_exceptions.NotFound as e:  # Catch specific exception first
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return scheduling_services.restore_scheduling(scheduling_id)
 
 
 @router.put(
@@ -200,11 +184,4 @@ def update_scheduling(
     scheduling: SchedulingUpdateDTO,
     scheduling_services: services = Depends(get_scheduling_services),
 ):
-    try:
-        return scheduling_services.update_scheduling(scheduling_id, scheduling)
-    except scheduling_exceptions.NotFound as e:  # Catch specific exception first
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return scheduling_services.update_scheduling(scheduling_id, scheduling)
