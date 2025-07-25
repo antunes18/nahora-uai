@@ -1,36 +1,46 @@
-from api.core import auth
+from typing import List
 from sqlalchemy.orm import Session
+
+from api.core import auth
+
 from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, InvalidData, FieldAlreadyUsed
-from api.models.dto.user_dto import UserCreateDTO, UserResponseDTO, UserLoginDTO, UserUpdateDTO
-from api.repository.user_repository import UserRepository
+
 from api.models.user import User
-from api.core.auth import Token
+from api.models.dto.user_dto import UserCreateDTO, UserResponseDTO, UserLoginDTO, UserUpdateDTO
+
+from api.repository.user_repository import UserRepository
+from api.repository.tenant_repository import TenantRepository
 
 
 class UserServices:
-    def __init__(self, user_repo: UserRepository) -> None:
+    def __init__(self, user_repo: UserRepository, tenant_repo: TenantRepository) -> None:
         self.user_repo = user_repo
+        self.tenant_repo = tenant_repo
 
-    def register_user(self, user: UserCreateDTO):
-        if self.user_repo.get_user_by_email(user.email):
+    def register_user(self, dto: UserCreateDTO):
+        if self.user_repo.get_user_by_email(dto.email):
             raise EntityAlreadyExists("Usuário com esse Email")
 
-        if self.user_repo.get_user_by_username(user.username):
+        if self.user_repo.get_user_by_username(dto.username):
             raise FieldAlreadyUsed("Usuário com esse Username")
 
-        if self.user_repo.get_user_by_phone_number(user.phone):
+        if self.user_repo.get_user_by_phone_number(dto.phone):
             raise FieldAlreadyUsed("Número de Telefone")
 
+        if self.tenant_repo.get_one(dto.tenant_id) and dto.tenant_id != 0:
+            raise EntityNotFound("Tenant")
+
         user = User(
-            username=user.username,
-            email=user.email,
-            phone=user.phone,
-            password=auth.hash_password(user.password),
+            username=dto.username,
+            email=dto.email,
+            phone=dto.phone,
+            password=auth.hash_password(dto.password),
             disabled=False,
+            tenant_id=dto.tenant_id
         )
         return self.user_repo.create_user(user)
 
-    def login(self, user_login: UserLoginDTO) -> Token:
+    def login(self, user_login: UserLoginDTO) -> auth.Token:
         user_data: UserResponseDTO = self.user_repo.get_user_by_email(
             user_login.email)
 
@@ -40,7 +50,7 @@ class UserServices:
         if auth.verify_password(user_login.password, user_data.password):
             token = auth.sign(user_data)
 
-            return Token(access_token=token)
+            return auth.Token(access_token=token)
 
         raise InvalidData("Email ou Senha de Usuário")
 

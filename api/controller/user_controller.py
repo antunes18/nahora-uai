@@ -2,7 +2,7 @@ from api.core.jwt_bearer import JwtBearer
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from api.repository.user_repository import UserRepository
-from api.services.auth_services import UserServices as services
+from api.services.auth_services import UserServices
 from api.core.database import get_db
 from api.models.dto.user_dto import (
     UserResponseDTO,
@@ -16,6 +16,10 @@ router = APIRouter(prefix="/user", tags=["Users"])
 
 def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
     return UserRepository(session=db)
+
+
+def get_tenant_repo(db: Session: Depends(get_db)) -> TenantRepository:
+    return TenantR
 
 
 def get_user_services(
@@ -40,7 +44,7 @@ def get_user_services(
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
     status_code=200,
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def get_all_users(
     skip: int = 0,
@@ -66,7 +70,7 @@ def get_all_users(
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def get_user(user_id: int, user_services: services = Depends(get_user_services)):
     return user_services.get_user(user_id)
@@ -86,7 +90,7 @@ def get_user(user_id: int, user_services: services = Depends(get_user_services))
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def update_user(
     user_id: int,
@@ -110,7 +114,7 @@ def update_user(
         },
         500: {"model": GenericError, "description": "Error no Servidor!"},
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def delete_user(user_id: int, user_services: services = Depends(get_user_services)):
     return user_services.delete_user(user_id)
@@ -130,7 +134,7 @@ def delete_user(user_id: int, user_services: services = Depends(get_user_service
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    dependencies=[Depends(JwtBearer())],
+    # dependencies=[Depends(JwtBearer())],
 )
 def restore_user(user_id: int, user_services: services = Depends(get_user_services)):
     return user_services.restore_user(user_id)

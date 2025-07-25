@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 from api.core.database import Base
@@ -7,12 +7,12 @@ from api.core.database import Base
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, unique=True, primary_key=True, autoincrement=True)
-    username = Column(String, unique=True, nullable=False)
-    phone = Column(String, unique=True, nullable=True)
-    email = Column(String, unique=True, nullable=False)
-    password = Column(String, unique=False, nullable=False)
-    role = Column(String, unique=False, nullable=False)
-    disabled = Column(Boolean, default=False)
+    username: str = Column(String, unique=True, nullable=False)
+    phone: str = Column(String, unique=True, nullable=True)
+    email: str = Column(String, unique=True, nullable=False)
+    password: str = Column(String, unique=False, nullable=False)
+    role: str = Column(String, unique=False, nullable=False)
+    disabled: bool = Column(Boolean, default=False)
 
     scheduling = relationship("Scheduling", back_populates="user")
-    tenant_id = relationship("Tenant", back_populates="tenant")
+    tenant_id: int | None = Column(ForeignKey("tenants.id"))
