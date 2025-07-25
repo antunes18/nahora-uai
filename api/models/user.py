@@ -13,4 +13,6 @@ class User(Base):
     password = Column(String, unique=False, nullable=False)
     role = Column(String, unique=False, nullable=False)
     disabled = Column(Boolean, default=False)
+
     scheduling = relationship("Scheduling", back_populates="user")
+    tenant_id = relationship("Tenant", back_populates="tenant")
