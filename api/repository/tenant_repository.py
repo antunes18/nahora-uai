@@ -2,6 +2,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 from api.models.tenant import Tenant
+from api.models.user import User
 
 
 class TenantRepository:

@@ -6,8 +6,9 @@ from api.core.database import get_db
 from api.core.jwt_bearer import JwtBearer
 from api.exceptions.message import GenericError
 
-from api.models.tenant import Tenant
 from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, TenantUpdateDTO
+
+from api.models.dto.user_dto import UserResponseDTO
 
 from api.repository.tenant_repository import TenantRepository
 from api.services.tenant_services import TenantService
@@ -106,6 +107,31 @@ def get_all(skip: int = 0, limit: int = 100, service: TenantService = Depends(ge
 )
 def get_one(id: int, services: TenantService = Depends(get_tenant_services)):
     return services.get_one(id)
+
+
+@router.get(
+    "/{id}/users",
+    status_code=200,
+    response_model=List[UserResponseDTO],
+    response_model_exclude_unset=True,
+    responses={
+        201: {
+            "model": List[UserResponseDTO],
+            "description": "Lista de Users da Tenant",
+        },
+        403: {
+            "model": GenericError,
+            "description": "Usuário Não Autenticado!",
+        },
+        404: {
+            "model": GenericError,
+            "description": "Tenants não encontradas!",
+        }
+    },
+    # dependencies=[Depends(JwtBearer())],
+)
+def get_all_users(id: int = 0, service: TenantService = Depends(get_tenant_services)):
+    return service.get_all_users(tenant_id=id)
 
 
 @router.put(

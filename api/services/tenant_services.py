@@ -5,6 +5,7 @@ from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, Invalid
 from api.repository.tenant_repository import TenantRepository
 from api.models.tenant import Tenant
 from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, TenantUpdateDTO
+from api.models.dto.user_dto import UserResponseDTO
 
 
 class TenantService:
@@ -34,6 +35,9 @@ class TenantService:
 
     def get_one(self, tenant_id: int) -> Tenant:
         return self.tenant_repo.get_one(tenant_id)
+
+    def get_all_users(self, tenant_id: int) -> List[UserResponseDTO]:
+        return self.tenant_repo.get_one(tenant_id).users
 
     def update(self, tenant_id: int, update_tenant: TenantUpdateDTO) -> None:
         old_tenant: Tenant = self.get_one(tenant_id)

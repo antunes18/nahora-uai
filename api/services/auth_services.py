@@ -18,6 +18,10 @@ class UserServices:
         self.tenant_repo = tenant_repo
 
     def register_user(self, dto: UserCreateDTO):
+
+        if not self.tenant_repo.get_one(dto.tenant_id):
+            raise EntityNotFound("Tenant")
+
         if self.user_repo.get_user_by_email(dto.email):
             raise EntityAlreadyExists("Usuário com esse Email")
 
@@ -26,9 +30,6 @@ class UserServices:
 
         if self.user_repo.get_user_by_phone_number(dto.phone):
             raise FieldAlreadyUsed("Número de Telefone")
-
-        if self.tenant_repo.get_one(dto.tenant_id) and dto.tenant_id != 0:
-            raise EntityNotFound("Tenant")
 
         user = User(
             username=dto.username,

@@ -13,6 +13,7 @@ class User(Base):
     password: str = Column(String, unique=False, nullable=False)
     role: str = Column(String, unique=False, nullable=False)
     disabled: bool = Column(Boolean, default=False)
+    tenant_id: int = Column(ForeignKey("tenants.id"))
 
     scheduling = relationship("Scheduling", back_populates="user")
-    tenant_id: int | None = Column(ForeignKey("tenants.id"))
+    tenant = relationship("Tenant", back_populates="users")
