@@ -13,3 +13,4 @@ class Tenant(Base):
     primary_color: str = Column(String)
 
     users = relationship("User", back_populates="tenant")
+    schedulings = relationship("Scheduling", back_populates="tenant")

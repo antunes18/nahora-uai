@@ -1,8 +1,8 @@
-"""start
+"""scheduling
 
-Revision ID: d14f46f54aa2
+Revision ID: d41b80880cba
 Revises: 
-Create Date: 2025-07-25 10:33:36.645560
+Create Date: 2025-07-25 13:21:45.240074
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'd14f46f54aa2'
+revision: str = 'd41b80880cba'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,7 +31,7 @@ def upgrade() -> None:
     sa.UniqueConstraint('name')
     )
     op.create_table('tenants',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('subdomain', sa.String(), nullable=True),
     sa.Column('logo_url', sa.String(), nullable=True),
@@ -78,12 +78,14 @@ def upgrade() -> None:
     )
     op.create_table('scheduling',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('tenant_id', sa.Integer(), nullable=True),
     sa.Column('hour', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('phone', sa.String(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('is_deleted', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['tenant_id'], ['tenants.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

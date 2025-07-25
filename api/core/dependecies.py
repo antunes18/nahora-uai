@@ -54,8 +54,9 @@ def get_user_services(
 def get_scheduling_services(
     user_repo: UserRepository = Depends(get_user_repo),
     scheduling_repo: SchedulingReposistory = Depends(get_scheduling_repo),
+    tenant_repo: TenantRepository = Depends(get_tenant_repo)
 ) -> SchedulingService:
-    return SchedulingService(scheduling_repo=scheduling_repo, user_repo=user_repo)
+    return SchedulingService(scheduling_repo=scheduling_repo, user_repo=user_repo, tenant_repo=tenant_repo)
 
 
 def get_plan_services(

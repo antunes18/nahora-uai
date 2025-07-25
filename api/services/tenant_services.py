@@ -2,10 +2,13 @@ from typing import List
 
 from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, InvalidData, FieldAlreadyUsed
 
-from api.repository.tenant_repository import TenantRepository
 from api.models.tenant import Tenant
+
 from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, TenantUpdateDTO
 from api.models.dto.user_dto import UserResponseDTO
+from api.models.dto.scheduling_dto import SchedulingResponseDTO
+
+from api.repository.tenant_repository import TenantRepository
 
 
 class TenantService:
@@ -38,6 +41,9 @@ class TenantService:
 
     def get_all_users(self, tenant_id: int) -> List[UserResponseDTO]:
         return self.tenant_repo.get_one(tenant_id).users
+
+    def get_all_schedulings(self, tenant_id: int) -> List[SchedulingResponseDTO]:
+        return self.tenant_repo.get_one(tenant_id=tenant_id).schedulings
 
     def update(self, tenant_id: int, update_tenant: TenantUpdateDTO) -> None:
         old_tenant: Tenant = self.get_one(tenant_id)
