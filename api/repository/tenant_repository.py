@@ -29,9 +29,11 @@ class TenantRepository:
     def get_by_subdomain(self, subdomain: str) -> Tenant:
         return self.session.query(Tenant).filter(Tenant.subdomain == subdomain).first()
 
-    def update(self, update_tenant: Tenant) -> None:
+    def update(self, update_tenant: Tenant) -> Tenant:
         self.session.commit()
         self.session.refresh(update_tenant)
+
+        return update_tenant
 
     def delete(self, tenant: Tenant) -> None:
         self.session.delete(tenant)

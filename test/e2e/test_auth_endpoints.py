@@ -9,7 +9,7 @@ from api.core.dependecies import get_user_services
 from api.models.dto.user_dto import UserUpdateDTO
 from api.models.user import User
 
-from test.mocks.user import mock_user_service, mock_user_repository, mock_user_update, new_user_json, login_user_json, test_user
+from test.mocks.user import mock_user_update, new_user_json, login_user_json, test_user
 from test.mocks.mock_token_user import auth_header
 
 

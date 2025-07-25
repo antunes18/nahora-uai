@@ -1,7 +1,6 @@
 from fastapi import Query
 from pydantic import BaseModel, Field
 from api.models.enums.roles import Roles
-from api.models.dto.tenant_dto import TenantResponseDTO
 
 
 class UserCreateDTO(BaseModel):
@@ -33,7 +32,6 @@ class UserResponseDTO(BaseModel):
     phone: str
     role: str
     disabled: bool
-    tenant: TenantResponseDTO
 
     class Config:
         from_attributes = True

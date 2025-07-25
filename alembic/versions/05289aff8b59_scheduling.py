@@ -1,8 +1,8 @@
 """scheduling
 
-Revision ID: d41b80880cba
+Revision ID: 05289aff8b59
 Revises: 
-Create Date: 2025-07-25 13:21:45.240074
+Create Date: 2025-07-25 17:51:28.192388
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'd41b80880cba'
+revision: str = '05289aff8b59'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -80,7 +80,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('tenant_id', sa.Integer(), nullable=True),
     sa.Column('hour', sa.Integer(), nullable=False),
-    sa.Column('date', sa.DateTime(), nullable=False),
+    sa.Column('date', sa.DateTime(timezone=True), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('phone', sa.String(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),

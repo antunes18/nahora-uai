@@ -10,7 +10,7 @@ from api.core.dependecies import get_user_services
 from api.models.dto.user_dto import UserUpdateDTO
 from api.models.user import User
 
-from test.mocks.user import mock_user_service, mock_user_repository, mock_user_update
+from test.mocks.user import mock_user_update
 from test.mocks.mock_token_user import auth_header
 
 from test.mocks.scheduling import mock_scheduling_list, test_scheduling, create_scheduling_json, update_scheduling_json
@@ -22,7 +22,7 @@ class Test_Scheduling_E2E:
         response = client.get("/scheduling", headers=auth_header)
 
         assert response.status_code == 200
-        assert len(response.json()) == 4
+        assert len(response.json()) == len(test_scheduling)
 
         app.dependency_overrides.clear()
 
@@ -30,10 +30,10 @@ class Test_Scheduling_E2E:
         response = client.get("/scheduling/1", headers=auth_header)
 
         assert response.status_code == 200
-        assert response.json()["hour"] == 12
-        assert response.json()["date"] == "2030-06-16T00:00:00"
-        assert response.json()["name"] == "test1"
-        assert response.json()["phone"] == str(1234567891231)
+        assert response.json()["hour"] == test_scheduling[0].hour
+        assert response.json()["date"] == test_scheduling[0].date.isoformat()
+        assert response.json()["name"] == test_scheduling[0].name
+        assert response.json()["phone"] == test_scheduling[0].phone
 
         app.dependency_overrides.clear()
 
