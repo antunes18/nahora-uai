@@ -1,24 +1,31 @@
+from datetime import timezone
+
 from api.models.dto.scheduling_dto import SchedulingDTO
 from api.models.scheduling import Scheduling
 from api.models.user import User
+
 from api.repository.scheduling_repository import SchedulingReposistory
+
+from test.factories.base import BaseMVCTestFactory
+
+from test.dependencies import real_scheduling_repo
+
 from test.mocks.scheduling import (
     mock_scheduling_list,
-    real_scheduling_repository,
     mock_scheduling,
     mock_scheduling_update,
 )
 from test.mocks.user import mock_user
 
 
-class TestSchedulingRepository:
+class TestSchedulingRepository(BaseMVCTestFactory):
     def test_create(
         self,
-        real_scheduling_repository: SchedulingReposistory,
+        real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
         mock_user: User,
     ):
-        data = real_scheduling_repository.create(mock_scheduling)
+        data = real_scheduling_repo.create(mock_scheduling)
 
         assert data is not None
         assert data.id == mock_scheduling.id
@@ -32,14 +39,14 @@ class TestSchedulingRepository:
 
     def find_scheduling_by_date_and_hour_and_user(
         self,
-        real_scheduling_repository: SchedulingReposistory,
+        real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
         mock_user: User,
     ):
-        real_scheduling_repository.session.add(mock_scheduling)
-        real_scheduling_repository.session.commit()
+        real_scheduling_repo.session.add(mock_scheduling)
+        real_scheduling_repo.session.commit()
 
-        data = real_scheduling_repository.find_scheduling_by_date_and_hour_and_user(
+        data = real_scheduling_repo.find_scheduling_by_date_and_hour_and_user(
             date=mock_scheduling.date, hour=mock_scheduling.hour, user_id=mock_user.id
         )
         assert data is not None
@@ -52,31 +59,31 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_find_all(
+    def test_get_all(
         self,
-        real_scheduling_repository: SchedulingReposistory,
+        real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
         mock_scheduling_list: list[Scheduling],
         mock_user: User,
     ):
-        real_scheduling_repository.session.add_all(mock_scheduling_list)
-        real_scheduling_repository.session.commit()
+        real_scheduling_repo.session.add_all(mock_scheduling_list)
+        real_scheduling_repo.session.commit()
 
-        data = real_scheduling_repository.find_all(skip=0, limit=10)
+        data = real_scheduling_repo.find_all(skip=0, limit=10)
 
         assert data is not None
         # assert len(data) == len(mock_scheduling_list)
 
-    def test_find_one_scheduling(
+    def test_get_one(
         self,
-        real_scheduling_repository: SchedulingReposistory,
+        real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
         mock_user: User,
     ):
-        real_scheduling_repository.session.add(mock_scheduling)
-        real_scheduling_repository.session.commit()
+        real_scheduling_repo.session.add(mock_scheduling)
+        real_scheduling_repo.session.commit()
 
-        data = real_scheduling_repository.find_one_scheduling(
+        data = real_scheduling_repo.find_one_scheduling(
             mock_scheduling.id)
 
         assert data is not None
@@ -89,16 +96,16 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_delete_scheduling(
+    def test_delete(
         self,
-        real_scheduling_repository: SchedulingReposistory,
+        real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
         mock_user: User,
     ):
-        real_scheduling_repository.session.add(mock_scheduling)
-        real_scheduling_repository.session.commit()
+        real_scheduling_repo.session.add(mock_scheduling)
+        real_scheduling_repo.session.commit()
 
-        data = real_scheduling_repository.delete_scheduling(mock_scheduling)
+        data = real_scheduling_repo.delete_scheduling(mock_scheduling)
 
         assert data is not None
         assert data.id == mock_scheduling.id
@@ -110,16 +117,16 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_restore_scheduling(
+    def test_restore(
         self,
-        real_scheduling_repository: SchedulingReposistory,
+        real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
         mock_user: User,
     ):
-        real_scheduling_repository.session.add(mock_scheduling)
-        real_scheduling_repository.session.commit()
+        real_scheduling_repo.session.add(mock_scheduling)
+        real_scheduling_repo.session.commit()
 
-        data = real_scheduling_repository.restore_scheduling(mock_scheduling)
+        data = real_scheduling_repo.restore_scheduling(mock_scheduling)
 
         assert data is not None
         assert data.id == mock_scheduling.id
@@ -131,22 +138,34 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_update_scheduling(
+    def test_update(
         self,
-        real_scheduling_repository: SchedulingReposistory,
+        real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
         mock_scheduling_update: Scheduling,
         mock_user: User,
     ):
-        real_scheduling_repository.session.add(mock_scheduling)
-        real_scheduling_repository.session.commit()
+        real_scheduling_repo.session.add(mock_scheduling)
+        real_scheduling_repo.session.commit()
 
-        data = real_scheduling_repository.update_scheduling(
-            mock_scheduling_update
+        original = real_scheduling_repo.session.get(
+            Scheduling, mock_scheduling.id
+        )
+
+        original.tenant_id = mock_scheduling_update.tenant_id
+        original.date = mock_scheduling_update.date
+        original.hour = mock_scheduling_update.hour
+        original.name = mock_scheduling_update.name
+        original.phone = mock_scheduling_update.phone
+        original.user_id = mock_scheduling_update.user_id
+
+        data = real_scheduling_repo.update_scheduling(
+            original
         )
 
         assert data is not None
-        assert data.date == mock_scheduling_update.date
+        assert data.date.replace(
+            tzinfo=timezone.utc) == mock_scheduling_update.date.replace(tzinfo=timezone.utc)
         assert data.hour == mock_scheduling_update.hour
         assert data.name == mock_scheduling_update.name
         assert data.phone == mock_scheduling_update.phone

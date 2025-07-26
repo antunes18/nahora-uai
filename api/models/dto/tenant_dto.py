@@ -12,9 +12,10 @@ class TenantCreateDTO(BaseModel):
 
 
 class TenantResponseDTO(BaseModel):
-    name: str = Field(min_length=3, max_length=250)
-    subdomain: str = Field(min_length=3, max_length=250)
-    logo_url: str = Field(min_length=3, max_length=250)
+    id: int
+    name: str
+    subdomain: str
+    logo_url: str
 
     class Config:
         from_attributes = True
