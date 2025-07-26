@@ -1,6 +1,5 @@
 import pytest
 from datetime import datetime, timezone
-from dateutil.parser import isoparse
 
 from sqlalchemy.orm import sessionmaker, Session
 from fastapi.testclient import TestClient
