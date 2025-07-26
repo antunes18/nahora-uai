@@ -1,8 +1,14 @@
 from typing import List
 
-from api.repository.tenant_repository import TenantRepository
+from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, InvalidData, FieldAlreadyUsed
+
 from api.models.tenant import Tenant
+
 from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, TenantUpdateDTO
+from api.models.dto.user_dto import UserResponseDTO
+from api.models.dto.scheduling_dto import SchedulingResponseDTO
+
+from api.repository.tenant_repository import TenantRepository
 
 
 class TenantService:
@@ -13,12 +19,10 @@ class TenantService:
 
     def create(self, tenant_create_dto: TenantCreateDTO) -> Tenant:
         if self.tenant_repo.get_by_name(tenant_create_dto.name):
-            # TODO: Implementar Exception
-            raise NotImplementedError("Error to Tenant Name Already Taken")
+            raise FieldAlreadyUsed("Nome de Tenant")
 
         if self.tenant_repo.get_by_subdomain(tenant_create_dto.subdomain):
-            # TODO: Implementar Exception
-            raise NotImplementedError("Error to Tenant Already Exist")
+            raise InvalidData("Subdominio de Tenant")
 
         tenant = Tenant(
             name=tenant_create_dto.name,
@@ -27,20 +31,31 @@ class TenantService:
             primary_color=tenant_create_dto.primary_color,
 
         )
-        return self.tenant_repo.create_tenant(tenant)
+        return self.tenant_repo.create(tenant)
 
     def get_all(self, skip: int, limit: int) -> List[Tenant]:
         return self.tenant_repo.get_all(skip, limit)
 
     def get_one(self, tenant_id: int) -> Tenant:
-        return self.tenant_repo.get_one(tenant_id)
+
+        tenant: Tenant = self.tenant_repo.get_one(tenant_id)
+
+        if not tenant:
+            raise EntityNotFound("Tenant")
+
+        return tenant
+
+    def get_all_users(self, tenant_id: int) -> List[UserResponseDTO]:
+        return self.tenant_repo.get_one(tenant_id).users
+
+    def get_all_schedulings(self, tenant_id: int) -> List[SchedulingResponseDTO]:
+        return self.tenant_repo.get_one(tenant_id=tenant_id).schedulings
 
     def update(self, tenant_id: int, update_tenant: TenantUpdateDTO) -> None:
-        old_tenant: Tenant = self.get_one(tenant_id)
+        old_tenant: Tenant = self.tenant_repo.get_one(tenant_id)
 
         if not old_tenant:
-            # TODO: Implementar Exception
-            raise NotImplementedError("EXCEPTION TO NOT FIND")
+            raise EntityNotFound("Tenant")
 
         try:
             old_tenant.name = update_tenant.name
@@ -50,14 +65,12 @@ class TenantService:
 
             return self.tenant_repo.update(update_tenant=old_tenant)
         except Exception:
-            # TODO: Implementar Exception
-            raise NotImplementedError("EXCEPTION ENTITY ERROR")
+            raise InvalidData("Dados da Tenant")
 
     def delete(self, tenant_id: int) -> None:
         tenant: Tenant = self.tenant_repo.get_one(tenant_id)
 
         if not tenant:
-            # TODO: Implementar Exception
-            raise NotImplementedError("EXCEPTION ENTITY NOT FOUND")
+            raise EntityNotFound("Tenant")
 
         return self.tenant_repo.delete(tenant)
