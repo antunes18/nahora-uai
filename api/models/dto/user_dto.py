@@ -9,6 +9,7 @@ class UserCreateDTO(BaseModel):
     phone: str = Field(pattern=r"^\d{13,}$", min_length=13, max_length=13)
     password: str = Field(min_length=8, max_length=128)
     confirm_password: str = Field(min_length=8, max_length=128)
+    tenant_id: int = Field()
 
     class Config:
         from_attributes = True
