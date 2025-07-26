@@ -9,7 +9,7 @@ class TenantRepository:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def create_tenant(self, tenant: Tenant) -> Tenant:
+    def create(self, tenant: Tenant) -> Tenant:
         self.session.add(tenant)
         self.session.commit()
         self.session.refresh(tenant)

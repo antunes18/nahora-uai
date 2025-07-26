@@ -30,8 +30,8 @@ class SchedulingFactory(BaseTestFactory):
         return SchedulingCreateDto(
             tenant_id=kwargs.get("tenant_id", 1),
             hour=kwargs.get("hour", random.randint(14, 18)),
-            date=kwargs.get("date", datetime.now(
-                timezone.utc) + timedelta(days=1)),
+            date=kwargs.get("date", (datetime.now(
+                timezone.utc) + timedelta(days=1))),
             name=kwargs.get("name", cls.random_string()),
             phone=kwargs.get("phone", cls.random_phone()),
             user_id=kwargs.get("user_id", 1),
@@ -42,8 +42,8 @@ class SchedulingFactory(BaseTestFactory):
         return Scheduling(
             tenant_id=kwargs.get("tenant_id", 1),
             hour=kwargs.get("hour", random.randint(14, 18)),
-            date=kwargs.get("date", datetime.now(
-                timezone.utc) + timedelta(days=1)),
+            date=kwargs.get("date", (datetime.now(
+                timezone.utc) + timedelta(days=1))),
             name=kwargs.get("name", "Client Test"),
             phone=kwargs.get("phone", cls.random_phone()),
             user_id=kwargs.get("user_id", 1),

@@ -5,6 +5,8 @@ from api.models.dto.tenant_dto import TenantCreateDTO, TenantUpdateDTO
 
 from api.repository.tenant_repository import TenantRepository
 
+from test.factories.base import BaseMVCTestFactory
+
 from test.dependencies import (
     real_tenant_repo
 )
@@ -16,9 +18,9 @@ from test.mocks.tenant import (
 )
 
 
-class TestTenantRepository:
-    def test_create_tenant(self, real_tenant_repo: TenantRepository, mock_tenant: Tenant) -> TenantRepository:
-        data = real_tenant_repo.create_tenant(mock_tenant)
+class TestTenantRepository(BaseMVCTestFactory):
+    def test_create(self, real_tenant_repo: TenantRepository, mock_tenant: Tenant) -> TenantRepository:
+        data = real_tenant_repo.create(mock_tenant)
 
         assert data is not None
         assert data.name == mock_tenant.name
@@ -35,7 +37,18 @@ class TestTenantRepository:
         assert data is not None
         assert len(data) == len(mock_tenant_list)
 
-    def test_update_user(
+    def test_get_one(self, real_tenant_repo: TenantRepository, mock_tenant: Tenant):
+        real_tenant_repo.session.add(mock_tenant)
+        real_tenant_repo.session.commit()
+
+        data = real_tenant_repo.get_one(mock_tenant.id)
+
+        assert data.name == mock_tenant.name
+        assert data.subdomain == mock_tenant.subdomain
+        assert data.logo_url == mock_tenant.logo_url
+        assert data.primary_color == mock_tenant.primary_color
+
+    def test_update(
         self,
         real_tenant_repo: TenantRepository,
         mock_tenant: Tenant,
@@ -61,7 +74,7 @@ class TestTenantRepository:
         assert data.logo_url == mock_tenant_update.logo_url
         assert data.primary_color == mock_tenant_update.primary_color
 
-    def test_delete_tenant(self, real_tenant_repo: TenantRepository, mock_tenant: Tenant):
+    def test_delete(self, real_tenant_repo: TenantRepository, mock_tenant: Tenant):
         real_tenant_repo.session.add(mock_tenant)
         real_tenant_repo.session.commit()
 

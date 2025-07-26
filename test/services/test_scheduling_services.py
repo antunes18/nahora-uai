@@ -1,10 +1,11 @@
-import re
 from unittest.mock import Mock
 
 from api.models.dto.scheduling_dto import SchedulingDTO
 from api.models.scheduling import Scheduling
 from api.models.user import User
 from api.services.scheduling_services import SchedulingService
+
+from test.factories.base import BaseMVCTestFactory
 
 from test.dependencies import (
     mock_user_repo,
@@ -22,8 +23,8 @@ from test.mocks.scheduling import (
 from test.mocks.user import mock_user
 
 
-class TestSchedulingServices:
-    def test_create_scheduling(
+class TestSchedulingServices(BaseMVCTestFactory):
+    def test_create(
         self,
         mock_scheduling_services: SchedulingService,
         mock_scheduling_repo: Mock,
@@ -45,7 +46,7 @@ class TestSchedulingServices:
         assert response.phone == mock_scheduling.phone
         assert response.user_id == mock_scheduling.user_id
 
-    def test_get_all_sheduling(
+    def test_get_all(
         self,
         mock_scheduling_repo: Mock,
         mock_scheduling_services: SchedulingService,
@@ -58,7 +59,7 @@ class TestSchedulingServices:
 
         assert response is not None
 
-    def test_get_scheduling(
+    def test_get_one(
         self,
         mock_scheduling_repo: Mock,
         mock_scheduling_services: SchedulingService,
@@ -76,7 +77,7 @@ class TestSchedulingServices:
         assert response.phone == mock_scheduling.phone
         assert response.user_id == mock_scheduling.user_id
 
-    def test_delete_scheduling(
+    def test_delete(
         self,
         mock_scheduling_repo: Mock,
         mock_scheduling_services: SchedulingService,
@@ -89,7 +90,7 @@ class TestSchedulingServices:
             mock_scheduling.id)
         assert response is not None
 
-    def test_restore_scheduling(
+    def test_restore(
         self,
         mock_scheduling_repo: Mock,
         mock_scheduling_services: SchedulingService,
@@ -103,7 +104,7 @@ class TestSchedulingServices:
             mock_scheduling.id)
         assert response is not None
 
-    def test_update_scheduling(
+    def test_update(
         self,
         mock_scheduling_repo: Mock,
         mock_scheduling_services: SchedulingService,

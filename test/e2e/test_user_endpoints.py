@@ -9,50 +9,8 @@ from api.core.dependecies import get_user_services
 from api.models.dto.user_dto import UserUpdateDTO
 from api.models.user import User
 
-from test.mocks.user import mock_user_update
+from test.mocks.user import mock_user_update, test_user, user_update_json
 from test.mocks.mock_token_user import auth_header
-
-
-@pytest.fixture
-def test_user(db_session_for_test: Session) -> User:
-    """
-    Cria um utilizador na base de dados para fins de teste.
-    """
-    users = [
-        User(
-            username="teste_de_user1",
-            email="teste1@teste.com",
-            phone="1234567891234",
-            password="stringstri",
-            role="user",
-            disabled=False,
-        ),
-        User(
-            username="teste_de_user2",
-            email="teste2@teste.com",
-            phone="9876543210111",
-            password="stringstri",
-            role="user",
-            disabled=False,
-        ),
-    ]
-
-    for user in users:
-        db_session_for_test.add(user)
-        db_session_for_test.commit()
-
-    return users
-
-
-@pytest.fixture
-def user_update_json():
-    return ({
-        "username": "update_user",
-        "phone": "1234567891234",
-        "password": "stringupdate",
-        "confirm_password": "stringupdate",
-
-    })
 
 
 class Test_User_E2E:
@@ -68,7 +26,7 @@ class Test_User_E2E:
 
         # Assertions
         assert response.status_code == 200
-        assert len(response.json()) == 2
+        assert len(response.json()) == len(test_user)
 
         assert response.json()[0]["id"] == 1
         assert response.json()[1]["email"] == "teste2@teste.com"

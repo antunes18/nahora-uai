@@ -11,7 +11,7 @@ class Scheduling(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     tenant_id = Column(ForeignKey("tenants.id"))
     hour = Column(Integer, nullable=False)
-    date = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+    date = Column(DateTime(timezone=True), nullable=False)
     name = Column(String, nullable=False)
     phone = Column(String, nullable=False)
     user_id = Column(ForeignKey("users.id"))

@@ -31,13 +31,19 @@ class TenantService:
             primary_color=tenant_create_dto.primary_color,
 
         )
-        return self.tenant_repo.create_tenant(tenant)
+        return self.tenant_repo.create(tenant)
 
     def get_all(self, skip: int, limit: int) -> List[Tenant]:
         return self.tenant_repo.get_all(skip, limit)
 
     def get_one(self, tenant_id: int) -> Tenant:
-        return self.tenant_repo.get_one(tenant_id)
+
+        tenant: Tenant = self.tenant_repo.get_one(tenant_id)
+
+        if not tenant:
+            raise EntityNotFound("Tenant")
+
+        return tenant
 
     def get_all_users(self, tenant_id: int) -> List[UserResponseDTO]:
         return self.tenant_repo.get_one(tenant_id).users
@@ -46,7 +52,7 @@ class TenantService:
         return self.tenant_repo.get_one(tenant_id=tenant_id).schedulings
 
     def update(self, tenant_id: int, update_tenant: TenantUpdateDTO) -> None:
-        old_tenant: Tenant = self.get_one(tenant_id)
+        old_tenant: Tenant = self.tenant_repo.get_one(tenant_id)
 
         if not old_tenant:
             raise EntityNotFound("Tenant")

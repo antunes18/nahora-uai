@@ -6,6 +6,8 @@ from api.models.user import User
 
 from api.repository.scheduling_repository import SchedulingReposistory
 
+from test.factories.base import BaseMVCTestFactory
+
 from test.dependencies import real_scheduling_repo
 
 from test.mocks.scheduling import (
@@ -16,7 +18,7 @@ from test.mocks.scheduling import (
 from test.mocks.user import mock_user
 
 
-class TestSchedulingRepository:
+class TestSchedulingRepository(BaseMVCTestFactory):
     def test_create(
         self,
         real_scheduling_repo: SchedulingReposistory,
@@ -57,7 +59,7 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_find_all(
+    def test_get_all(
         self,
         real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
@@ -72,7 +74,7 @@ class TestSchedulingRepository:
         assert data is not None
         # assert len(data) == len(mock_scheduling_list)
 
-    def test_find_one_scheduling(
+    def test_get_one(
         self,
         real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
@@ -94,7 +96,7 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_delete_scheduling(
+    def test_delete(
         self,
         real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
@@ -115,7 +117,7 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_restore_scheduling(
+    def test_restore(
         self,
         real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,
@@ -136,7 +138,7 @@ class TestSchedulingRepository:
         assert data.user == mock_scheduling.user
         assert data.is_deleted == mock_scheduling.is_deleted
 
-    def test_update_scheduling(
+    def test_update(
         self,
         real_scheduling_repo: SchedulingReposistory,
         mock_scheduling: Scheduling,

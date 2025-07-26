@@ -1,5 +1,5 @@
 import pytest
-import datetime
+from datetime import datetime, timezone, timedelta
 
 from sqlalchemy.orm import Session
 from typing import List
@@ -53,7 +53,7 @@ def test_scheduling(db_session_for_test: Session, mock_scheduling_list: List[Sch
 def create_scheduling_json():
     return ({
         "tenant_id": 1,
-        "date": "2030-07-16T23:15:36.736Z",
+        "date": (datetime.now(timezone.utc) + timedelta(days=3)).isoformat(),
         "hour": 16,
         "name": "client_username",
         "user_id": 1,
@@ -65,8 +65,8 @@ def create_scheduling_json():
 @pytest.fixture
 def update_scheduling_json():
     return ({
-        "tenant_id": "1",
-        "date": "2030-07-16T23:15:36.736Z",
+        "tenant_id": 1,
+        "date": (datetime.now(timezone.utc) + timedelta(days=3)).isoformat(),
         "hour": 18,
         "name": "update_client_username",
         "user_id": 1,

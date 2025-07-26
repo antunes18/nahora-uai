@@ -53,12 +53,48 @@ def test_user(db_session_for_test: Session) -> User:
         tenant_id="1"
     )
 
-    user.password = password
+    """
+    Cria um utilizador na base de dados para fins de teste.
+    """
+    users = [
+        User(
+            username="teste_de_user1",
+            email="teste1@teste.com",
+            phone="1234567891234",
+            password="",
+            role="user",
+            disabled=False,
+            tenant_id=1
+        ),
+        User(
+            username="teste_de_user2",
+            email="teste2@teste.com",
+            phone="9876543210111",
+            password="stringstri",
+            role="user",
+            disabled=False,
+            tenant_id=1
+        ),
+    ]
 
-    db_session_for_test.add(user)
-    db_session_for_test.commit()
+    users[0].password = password
 
-    return user
+    for user in users:
+        db_session_for_test.add(user)
+        db_session_for_test.commit()
+
+    return users
+
+
+@pytest.fixture
+def user_update_json():
+    return ({
+        "username": "update_user",
+        "phone": "1234567891234",
+        "password": "stringupdate",
+        "confirm_password": "stringupdate",
+
+    })
 
 
 @pytest.fixture

@@ -28,8 +28,8 @@ def mock_tenant_list():
     return TenantFactory.create_batch()
 
 
-@pytest.fixture()
-def test_tenant(db_session_for_test: Session, mock_tenant_list: List[TenantResponseDTO], mock_tenant: Tenant):
+@pytest.fixture
+def test_tenant(db_session_for_test: Session, mock_tenant_list):
     """
     Cria um utilizador na base de dados para fins de teste.
     """
@@ -59,4 +59,6 @@ def update_tenant_json():
         "logo_url": "update_logo_url",
         "primary_color": "update_primary_color"
     }
+
+
     )

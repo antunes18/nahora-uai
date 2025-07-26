@@ -44,3 +44,52 @@ class BaseTestFactory(ABC):
     def dto_batch(cls, n=5, **kwargs):
         """ Criar uma lista de DTOs do MODELO"""
         return [cls.dto(**kwargs) for _ in range(n)]
+
+
+class BaseMVCTestFactory(ABC):
+    @abstractmethod
+    def test_get_all(cls, **kwargs):
+        pass
+
+    @abstractmethod
+    def test_get_one(cls, **kwargs):
+        pass
+
+    @abstractmethod
+    def test_create(cls, **kwargs):
+        pass
+
+    @abstractmethod
+    def test_update(cls, **kwargs):
+        pass
+
+    @abstractmethod
+    def test_delete(cls, **kwargs):
+        pass
+
+    def __init_subclass__(cls):
+        super().__init_subclass__()
+
+        abstract_methods = {
+            name
+            for name, value in cls.__dict__.items()
+            if getattr(value, "__isabstractmethod__", False)
+        }
+
+        # Também verificar na base
+        for base in cls.__mro__[1:]:
+            if hasattr(base, "__abstractmethods__"):
+                abstract_methods |= base.__abstractmethods__
+
+        # Verificar métodos que não foram sobrescritos (são ainda abstratos)
+        not_implemented = set()
+        for method in abstract_methods:
+            # Se a classe não implementou o método
+            if method not in cls.__dict__:
+                not_implemented.add(method)
+
+        if not_implemented:
+            raise TypeError(
+                f"Classe {cls.__name__} não implementa os métodos abstratos: "
+                f"{', '.join(not_implemented)}"
+            )
