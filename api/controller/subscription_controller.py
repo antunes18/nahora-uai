@@ -3,39 +3,21 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from api.core.database import get_db
+from api.core.dependecies import get_subscription_services
+
 from api.exceptions.message import GenericError
 
 from api.models.subscription import Subscription
 from api.models.dto.subscription_dto import SubscriptionCreateDTO, SubscriptionResponseDTO, SubscriptionUpdateDTO
 
 from api.repository.subscription_repository import SubscriptionRepository
-from api.repository.plan_repository import PlanRepository
-from api.repository.tenant_repository import TenantRepository
+from api.services.plan_services import PlanService
+from api.services.tenant_services import TenantService
 
 from api.services.subscription_services import SubscriptionService
 
 
 router = APIRouter(prefix="/subscription", tags=["Subscription"])
-
-
-def get_subscription_repo(db: Session = Depends(get_db)) -> SubscriptionRepository:
-    return SubscriptionRepository(session=db)
-
-
-def get_plan_repo(db: Session = Depends(get_db)) -> PlanRepository:
-    return PlanRepository(session=db)
-
-
-def get_tenant_repo(db: Session = Depends(get_db)) -> TenantRepository:
-    return TenantRepository(session=db)
-
-
-def get_subscription_services(
-    subscription_repo: SubscriptionRepository = Depends(get_subscription_repo),
-    plan_repo: PlanRepository = Depends(get_plan_repo),
-    tenant_repo: TenantRepository = Depends(get_tenant_repo)
-) -> SubscriptionService:
-    return SubscriptionService(subscription_repo=subscription_repo, plan_repo=plan_repo, tenant_repo=tenant_repo)
 
 
 @router.post(
