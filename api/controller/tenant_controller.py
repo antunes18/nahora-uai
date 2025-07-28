@@ -51,7 +51,7 @@ def get_tenant_services(
             "description": "Dados estão incorretos",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def create(
     dto: TenantCreateDTO,
@@ -79,7 +79,7 @@ def create(
             "description": "Tenants não encontradas!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all(skip: int = 0, limit: int = 100, service: TenantService = Depends(get_tenant_services)):
     return service.get_all(skip=skip, limit=limit)
@@ -104,7 +104,7 @@ def get_all(skip: int = 0, limit: int = 100, service: TenantService = Depends(ge
             "description": "Tenant não encontrada!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_one(id: int, services: TenantService = Depends(get_tenant_services)):
     return services.get_one(id)
@@ -129,7 +129,7 @@ def get_one(id: int, services: TenantService = Depends(get_tenant_services)):
             "description": "Tenants não encontradas!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_users(id: int = 0, service: TenantService = Depends(get_tenant_services)):
     return service.get_all_users(tenant_id=id)
@@ -154,7 +154,7 @@ def get_all_users(id: int = 0, service: TenantService = Depends(get_tenant_servi
             "description": "Tenants não encontradas!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_schedulings(id: int = 0, service: TenantService = Depends(get_tenant_services)):
     return service.get_all_schedulings(tenant_id=id)
@@ -176,8 +176,8 @@ def get_all_schedulings(id: int = 0, service: TenantService = Depends(get_tenant
             "model": GenericError,
             "description": "Tenant não encontrada!",
         }
-    }
-    # dependencies=[Depends(JwtBearer())],
+    },
+    dependencies=[Depends(JwtBearer())],
 )
 def update(
     id: int,
@@ -204,7 +204,7 @@ def update(
             "description": "Tenant não encontrada!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def delete(id: int, services: TenantService = Depends(get_tenant_services)):
     return services.delete(tenant_id=id)
