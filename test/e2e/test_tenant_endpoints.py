@@ -12,6 +12,8 @@ from test.mocks.tenant import mock_tenant_update
 from test.mocks.mock_token_user import auth_header
 
 from test.mocks.tenant import mock_tenant, mock_tenant_list, test_tenant, create_tenant_json, update_tenant_json
+from test.mocks.user import test_user
+from test.mocks.scheduling import test_scheduling, mock_scheduling_list
 
 
 class Test_Tenant_E2E(BaseMVCTestFactory):
@@ -72,5 +74,25 @@ class Test_Tenant_E2E(BaseMVCTestFactory):
         result = client.get("/tenant/1", headers=auth_header)
 
         assert result.status_code == 404
+
+        app.dependency_overrides.clear()
+
+    def test_get_users(self, client, test_tenant, test_user, auth_header):
+        response = client.get("/tenant/1/users", headers=auth_header)
+
+        assert response.status_code == 200
+
+        assert len(response.json()) == len(
+            [user for user in test_user if user.tenant_id == 1])
+
+        app.dependency_overrides.clear()
+
+    def test_get_schedulings(self, client, test_tenant, test_scheduling, auth_header):
+        response = client.get("/tenant/1/schedulings", headers=auth_header)
+
+        assert response.status_code == 200
+
+        assert len(response.json()) == len(
+            [scheduling for scheduling in test_scheduling if scheduling.tenant_id == 1])
 
         app.dependency_overrides.clear()
