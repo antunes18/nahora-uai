@@ -30,7 +30,7 @@ router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
             "description": "Usuário com esse id não existe!",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def create_Scheduling(
     scheduling: SchedulingCreateDto,
@@ -50,7 +50,7 @@ def create_Scheduling(
             "description": "Lista de Schedulings",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_scheduling(
     skip: int = 0,
@@ -71,7 +71,7 @@ def get_all_scheduling(
             "description": "Lista de Schedulings do usuario",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_schedulings_by_user(
     user_id: int,
@@ -97,7 +97,7 @@ def get_all_schedulings_by_user(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_one_scheduling(
     id: int, services: SchedulingService = Depends(get_scheduling_services)
@@ -118,7 +118,7 @@ def get_one_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def delete_scheduling(
     id: int, services: SchedulingService = Depends(get_scheduling_services)
@@ -139,7 +139,7 @@ def delete_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def restore_scheduling(
     id: int, services: SchedulingService = Depends(get_scheduling_services)
@@ -160,7 +160,7 @@ def restore_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def update_scheduling(
     id: int,
