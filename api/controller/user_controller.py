@@ -31,7 +31,7 @@ router = APIRouter(prefix="/user", tags=["Users"])
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
     status_code=200,
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_users(
     skip: int = 0,
@@ -57,7 +57,7 @@ def get_all_users(
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_user(id: int, services: UserServices = Depends(get_user_services)):
     return services.get_user(id)
@@ -77,7 +77,7 @@ def get_user(id: int, services: UserServices = Depends(get_user_services)):
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def update_user(
     id: int,
@@ -101,7 +101,7 @@ def update_user(
         },
         500: {"model": GenericError, "description": "Error no Servidor!"},
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def delete_user(id: int, services: UserServices = Depends(get_user_services)):
     return services.delete_user(user_id=id)
@@ -121,7 +121,7 @@ def delete_user(id: int, services: UserServices = Depends(get_user_services)):
         },
         500: {"model": GenericError, "description": "Error no Servidor"},
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def restore_user(id: int, services: UserServices = Depends(get_user_services)):
     return services.restore_user(user_id=id)
