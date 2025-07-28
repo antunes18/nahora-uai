@@ -1,0 +1,76 @@
+from typing import List
+
+from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, InvalidData, FieldAlreadyUsed
+
+from api.models.tenant import Tenant
+
+from api.models.dto.tenant_dto import TenantCreateDTO, TenantResponseDTO, TenantUpdateDTO
+from api.models.dto.user_dto import UserResponseDTO
+from api.models.dto.scheduling_dto import SchedulingResponseDTO
+
+from api.repository.tenant_repository import TenantRepository
+
+
+class TenantService:
+    def __init__(
+        self, tenant_repo: TenantRepository
+    ) -> None:
+        self.tenant_repo = tenant_repo
+
+    def create(self, tenant_create_dto: TenantCreateDTO) -> Tenant:
+        if self.tenant_repo.get_by_name(tenant_create_dto.name):
+            raise FieldAlreadyUsed("Nome de Tenant")
+
+        if self.tenant_repo.get_by_subdomain(tenant_create_dto.subdomain):
+            raise InvalidData("Subdominio de Tenant")
+
+        tenant = Tenant(
+            name=tenant_create_dto.name,
+            subdomain=tenant_create_dto.subdomain,
+            logo_url=tenant_create_dto.logo_url,
+            primary_color=tenant_create_dto.primary_color,
+
+        )
+        return self.tenant_repo.create(tenant)
+
+    def get_all(self, skip: int, limit: int) -> List[Tenant]:
+        return self.tenant_repo.get_all(skip, limit)
+
+    def get_one(self, tenant_id: int) -> Tenant:
+
+        tenant: Tenant = self.tenant_repo.get_one(tenant_id)
+
+        if not tenant:
+            raise EntityNotFound("Tenant")
+
+        return tenant
+
+    def get_all_users(self, tenant_id: int) -> List[UserResponseDTO]:
+        return self.tenant_repo.get_one(tenant_id).users
+
+    def get_all_schedulings(self, tenant_id: int) -> List[SchedulingResponseDTO]:
+        return self.tenant_repo.get_one(tenant_id=tenant_id).schedulings
+
+    def update(self, tenant_id: int, update_tenant: TenantUpdateDTO) -> None:
+        old_tenant: Tenant = self.tenant_repo.get_one(tenant_id)
+
+        if not old_tenant:
+            raise EntityNotFound("Tenant")
+
+        try:
+            old_tenant.name = update_tenant.name
+            old_tenant.subdomain = update_tenant.subdomain
+            old_tenant.logo_url = update_tenant.logo_url
+            old_tenant.primary_color = update_tenant.primary_color
+
+            return self.tenant_repo.update(update_tenant=old_tenant)
+        except Exception:
+            raise InvalidData("Dados da Tenant")
+
+    def delete(self, tenant_id: int) -> None:
+        tenant: Tenant = self.tenant_repo.get_one(tenant_id)
+
+        if not tenant:
+            raise EntityNotFound("Tenant")
+
+        return self.tenant_repo.delete(tenant)

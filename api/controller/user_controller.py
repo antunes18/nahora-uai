@@ -1,27 +1,18 @@
-from api.core.jwt_bearer import JwtBearer
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from api.repository.user_repository import UserRepository
-from api.services.auth_services import UserServices as services
-from api.core.database import get_db
+from typing import List
+
+from api.core.jwt_bearer import JwtBearer
+from api.core.dependecies import get_user_services
+from api.exceptions.message import GenericError
+
+from api.services.auth_services import UserServices
+
 from api.models.dto.user_dto import (
     UserResponseDTO,
     UserUpdateDTO,
 )
-from api.exceptions.message import GenericError
-from typing import List
 
 router = APIRouter(prefix="/user", tags=["Users"])
-
-
-def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
-    return UserRepository(session=db)
-
-
-def get_user_services(
-    user_repo: UserRepository = Depends(get_user_repo),
-) -> services:
-    return services(user_repo=user_repo)
 
 
 @router.get(
@@ -45,13 +36,13 @@ def get_user_services(
 def get_all_users(
     skip: int = 0,
     limit: int = 100,
-    user_services: services = Depends(get_user_services),
-):
-    return user_services.get_all(skip, limit)
+    services: UserServices = Depends(get_user_services),
+) -> List[UserResponseDTO]:
+    return services.get_all(skip=skip, limit=limit)
 
 
 @router.get(
-    "/{user_id}",
+    "/{id}",
     status_code=200,
     response_model=UserResponseDTO,
     response_model_exclude_unset=True,
@@ -68,12 +59,12 @@ def get_all_users(
     },
     dependencies=[Depends(JwtBearer())],
 )
-def get_user(user_id: int, user_services: services = Depends(get_user_services)):
-    return user_services.get_user(user_id)
+def get_user(id: int, services: UserServices = Depends(get_user_services)):
+    return services.get_user(id)
 
 
 @router.put(
-    "/{user_id}",
+    "/{id}",
     status_code=204,
     response_model_exclude_unset=True,
     responses={
@@ -89,15 +80,15 @@ def get_user(user_id: int, user_services: services = Depends(get_user_services))
     dependencies=[Depends(JwtBearer())],
 )
 def update_user(
-    user_id: int,
-    update_user_data: UserUpdateDTO,
-    user_services: services = Depends(get_user_services),
+    id: int,
+    update_data: UserUpdateDTO,
+    services: UserServices = Depends(get_user_services),
 ):
-    return user_services.update_user(user_id, update_user_data)
+    return services.update_user(user_id=id, update_user=update_data)
 
 
 @router.delete(
-    "/{user_id}",
+    "/{id}",
     status_code=204,
     response_model_exclude_unset=True,
     responses={
@@ -112,12 +103,12 @@ def update_user(
     },
     dependencies=[Depends(JwtBearer())],
 )
-def delete_user(user_id: int, user_services: services = Depends(get_user_services)):
-    return user_services.delete_user(user_id)
+def delete_user(id: int, services: UserServices = Depends(get_user_services)):
+    return services.delete_user(user_id=id)
 
 
 @router.put(
-    "/restore/{user_id}",
+    "/restore/{id}",
     status_code=204,
     response_model_exclude_unset=True,
     responses={
@@ -132,5 +123,5 @@ def delete_user(user_id: int, user_services: services = Depends(get_user_service
     },
     dependencies=[Depends(JwtBearer())],
 )
-def restore_user(user_id: int, user_services: services = Depends(get_user_services)):
-    return user_services.restore_user(user_id)
+def restore_user(id: int, services: UserServices = Depends(get_user_services)):
+    return services.restore_user(user_id=id)

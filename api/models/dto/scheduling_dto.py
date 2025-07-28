@@ -1,5 +1,4 @@
 from pydantic import BaseModel, ConfigDict
-from pydantic import BaseModel
 
 from datetime import datetime
 
@@ -22,6 +21,7 @@ class SchedulingResponseDTO(BaseModel):
 
 class SchedulingCreateDto(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    tenant_id: int
     date: datetime
     hour: int
     name: str
