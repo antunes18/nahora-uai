@@ -1,21 +1,38 @@
 from typing import List
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 from api.core.jwt_bearer import JwtBearer
+from api.core.database import get_db
 from api.exceptions.message import GenericError
+from api.repository.scheduling_repository import SchedulingReposistory
+from api.repository.user_repository import UserRepository
 from api.services.scheduling_services import SchedulingService
 from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto, SchedulingUpdateDTO
-
-from api.core.dependecies import get_scheduling_services
 
 
 router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
 
 
+def get_scheduling_repo(db: Session = Depends(get_db)) -> SchedulingReposistory:
+    return SchedulingReposistory(session=db)
+
+
+def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
+    return UserRepository(session=db)
+
+
+def get_scheduling_services(
+    user_repo: UserRepository = Depends(get_user_repo),
+    scheduling_repo: SchedulingReposistory = Depends(get_scheduling_repo),
+) -> SchedulingService:
+    return SchedulingService(scheduling_repo=scheduling_repo, user_repo=user_repo)
+
+
 @router.post(
     "/",
-    status_code=201,
     response_model=SchedulingDTO,
     response_model_exclude_unset=True,
+    status_code=201,
     responses={
         201: {
             "model": SchedulingDTO,
@@ -30,7 +47,7 @@ router = APIRouter(prefix="/scheduling", tags=["Scheduling"])
             "description": "Usuário com esse id não existe!",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def create_Scheduling(
     scheduling: SchedulingCreateDto,
@@ -41,7 +58,6 @@ def create_Scheduling(
 
 @router.get(
     "/",
-    status_code=200,
     response_model=List[SchedulingDTO],
     response_model_exclude_unset=True,
     responses={
@@ -50,7 +66,8 @@ def create_Scheduling(
             "description": "Lista de Schedulings",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    status_code=200,
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_scheduling(
     skip: int = 0,
@@ -62,7 +79,6 @@ def get_all_scheduling(
 
 @router.get(
     "/user/{user_id}",
-    status_code=200,
     response_model=List[SchedulingDTO],
     response_model_exclude_unset=True,
     responses={
@@ -71,7 +87,8 @@ def get_all_scheduling(
             "description": "Lista de Schedulings do usuario",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    status_code=200,
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all_schedulings_by_user(
     user_id: int,
@@ -84,9 +101,9 @@ def get_all_schedulings_by_user(
 
 @router.get(
     "/{id}",
-    status_code=200,
     response_model=SchedulingDTO,
     response_model_exclude_unset=True,
+    status_code=200,
     responses={
         200: {
             "model": SchedulingDTO,
@@ -97,7 +114,7 @@ def get_all_schedulings_by_user(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_one_scheduling(
     id: int, services: SchedulingService = Depends(get_scheduling_services)
@@ -118,7 +135,7 @@ def get_one_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def delete_scheduling(
     id: int, services: SchedulingService = Depends(get_scheduling_services)
@@ -139,7 +156,7 @@ def delete_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def restore_scheduling(
     id: int, services: SchedulingService = Depends(get_scheduling_services)
@@ -160,7 +177,7 @@ def restore_scheduling(
             "description": "Scheduling Não Encontrado",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def update_scheduling(
     id: int,
