@@ -6,33 +6,26 @@ from api.models.dto.scheduling_dto import SchedulingDTO, SchedulingCreateDto
 from api.models.scheduling import Scheduling
 from api.repository.scheduling_repository import SchedulingReposistory
 from api.repository.user_repository import UserRepository
-from api.repository.tenant_repository import TenantRepository
 
 
 class SchedulingService:
     def __init__(
-        self, scheduling_repo: SchedulingReposistory, user_repo: UserRepository,
-        tenant_repo: TenantRepository
+        self, scheduling_repo: SchedulingReposistory, user_repo: UserRepository
     ) -> None:
         self.scheduling_repo = scheduling_repo
         self.user_repo = user_repo
-        self.tenant_repo = tenant_repo
 
     def create_scheduling(self, dto: SchedulingDTO) -> Scheduling:
-
-        if not self.tenant_repo.get_one(tenant_id=dto.tenant_id):
-            raise EntityNotFound("Tenant")
-
-        if not self.user_repo.get_user(user_id=dto.user_id):
-            raise EntityNotFound("Usuário")
 
         self.validate_scheduling(dto)
 
         if self.scheduling_repo.find_scheduling_by_date_and_hour_and_user(date=dto.date, hour=dto.hour, user_id=dto.user_id):
             raise EntityAlreadyExists("Scheduling")
 
+        if not self.user_repo.get_user(user_id=dto.user_id):
+            raise EntityNotFound("Usuário")
+
         scheduling: Scheduling = Scheduling(
-            tenant_id=dto.tenant_id,
             hour=dto.hour,
             date=dto.date,
             name=dto.name,

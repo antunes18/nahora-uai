@@ -9,14 +9,13 @@ from api.core.dependecies import get_user_services
 from api.models.dto.user_dto import UserUpdateDTO
 from api.models.user import User
 
-from test.mocks.user import mock_user_update, new_user_json, login_user_json, test_user
+from test.mocks.user import mock_user_service, mock_user_repository, mock_user_update, new_user_json, login_user_json, test_user
 from test.mocks.mock_token_user import auth_header
-from test.mocks.tenant import test_tenant, mock_tenant_list
 
 
 class Test_Auth_E2E:
 
-    def test_sign_in(self, client, auth_header, test_tenant, new_user_json):
+    def test_sign_in(self, client, auth_header, new_user_json):
         response = client.post(
             '/auth/signup', json=new_user_json, headers=auth_header)
 

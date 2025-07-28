@@ -1,3 +1,4 @@
+from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.orm import Session
 
@@ -7,12 +8,42 @@ from api.models.user import User
 from api.models.dto.user_dto import UserCreateDTO, UserLoginDTO, UserUpdateDTO
 from api.models.enums.roles import Roles
 
-from test.factories.user_factory import UserFactory
+from api.repository.user_repository import UserRepository
+from api.services.auth_services import UserServices
+
+
+@pytest.fixture
+def mock_user_repository():
+    return MagicMock(spec=UserRepository)
+
+
+@pytest.fixture
+def mock_user_service(mock_user_repository: UserRepository):
+    return UserServices(user_repo=mock_user_repository)
+
+
+@pytest.fixture
+def real_user_repository(db_session_for_test: Session):
+    """Fixture que fornece uma instância real do UserRepository com uma sessão de teste."""
+    return UserRepository(session=db_session_for_test)
+
+
+@pytest.fixture(scope="function")
+def real_users_services(user_repository: UserRepository):
+    """Fixture que fornece uma instância do UserService com um repositório real (para testes de integração)."""
+    return UserServices(user_repo=user_repository)
 
 
 @pytest.fixture(scope="function")
 def test_user_create():
-    return UserFactory.dto()
+    return UserCreateDTO(
+        username="teste_de_user",
+        email="teste111@teste.com",
+        password="stringstri",
+        phone="1234567891234",
+        confirm_password="stringstri",
+        role=Roles.user,
+    )
 
 
 @pytest.fixture(scope="function")
@@ -22,17 +53,82 @@ def test_user_login():
 
 @pytest.fixture
 def mock_user():
-    return UserFactory.create()
+    return User(
+        username="teste_de_user",
+        email="teste@teste.com",
+        password="stringstri",
+        phone="1234567891234",
+        role="user",
+        disabled=False,
+    )
+
+
+@pytest.fixture
+def mock_user_create():
+    return User(
+        username="teste_de_user",
+        email="teste@teste.com",
+        phone="1234567891234",
+        password="stringstri",
+        role="user",
+        disabled=False,
+    )
 
 
 @pytest.fixture
 def mock_user_update():
-    return UserFactory.update_dto()
+    return UserUpdateDTO(
+        username="update_user",
+        phone="1234567891234",
+        password="stringupdate",
+        confirm_password="stringupdate",
+    )
 
 
 @pytest.fixture
 def mock_list_user():
-    return UserFactory.create_batch()
+    return [
+        User(
+            username="teste_de_user1",
+            email="teste1@teste.com",
+            phone="1234567891234",
+            password="stringstri",
+            role="user",
+            disabled=False,
+        ),
+        User(
+            username="teste_de_user2",
+            email="teste2@teste.com",
+            phone="9876543210111",
+            password="stringstri",
+            role="user",
+            disabled=False,
+        ),
+        User(
+            username="teste_de_user3",
+            email="teste3@teste.com",
+            phone="1234567891235",
+            password="stringstri",
+            role="user",
+            disabled=False,
+        ),
+        User(
+            username="teste_de_user4",
+            email="teste4@teste.com",
+            phone="1234567891236",
+            password="stringstri",
+            role="user",
+            disabled=False,
+        ),
+        User(
+            username="teste_de_user5",
+            email="teste5@teste.com",
+            phone="1234567891237",
+            password="stringstri",
+            role="user",
+            disabled=False,
+        ),
+    ]
 
 
 @pytest.fixture(scope="function")
@@ -50,51 +146,14 @@ def test_user(db_session_for_test: Session) -> User:
         phone="1234567891234",
         role="user",
         disabled=False,
-        tenant_id="1"
     )
 
-    """
-    Cria um utilizador na base de dados para fins de teste.
-    """
-    users = [
-        User(
-            username="teste_de_user1",
-            email="teste1@teste.com",
-            phone="1234567891234",
-            password="",
-            role="user",
-            disabled=False,
-            tenant_id=1
-        ),
-        User(
-            username="teste_de_user2",
-            email="teste2@teste.com",
-            phone="9876543210111",
-            password="stringstri",
-            role="user",
-            disabled=False,
-            tenant_id=1
-        ),
-    ]
+    user.password = password
 
-    users[0].password = password
+    db_session_for_test.add(user)
+    db_session_for_test.commit()
 
-    for user in users:
-        db_session_for_test.add(user)
-        db_session_for_test.commit()
-
-    return users
-
-
-@pytest.fixture
-def user_update_json():
-    return ({
-        "username": "update_user",
-        "phone": "1234567891234",
-        "password": "stringupdate",
-        "confirm_password": "stringupdate",
-
-    })
+    return user
 
 
 @pytest.fixture
@@ -105,7 +164,6 @@ def new_user_json():
         "phone": "1234567891234",
         "password": "stringstri",
         "confirm_password": "stringstri",
-        "tenant_id": "1"
 
     })
 
