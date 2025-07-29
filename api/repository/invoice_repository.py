@@ -21,9 +21,11 @@ class InvoiceRepository:
     def get_one(self, invoice_id: int) -> Invoice:
         return self.session.query(Invoice).filter(Invoice.id == invoice_id).first()
 
-    def update(self, update_invoice: Invoice) -> None:
+    def update(self, update_invoice: Invoice) -> Invoice:
         self.session.commit()
         self.session.refresh(update_invoice)
+        return update_invoice
 
     def delete(self, invoice: Invoice) -> None:
         self.session.delete(invoice)
+        self.session.commit()

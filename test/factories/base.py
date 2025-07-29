@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import random
+import enum
 import string
 
 
@@ -16,6 +17,10 @@ class BaseTestFactory(ABC):
     @classmethod
     def random_phone(cls):
         return "".join(random.choices(string.digits, k=13))
+
+    @classmethod
+    def random_enum(cls, enum_cls: type[enum.Enum]):
+        return random.choice(list(enum_cls))
 
     @classmethod
     @abstractmethod
