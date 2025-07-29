@@ -2,8 +2,8 @@ from typing import List
 from datetime import datetime
 
 from api.repository.subscription_repository import SubscriptionRepository
-from api.services.plan_services import PlanService
-from api.services.tenant_services import TenantService
+from api.repository.plan_repository import PlanRepository
+from api.repository.tenant_repository import TenantRepository
 
 from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, InvalidData
 
@@ -15,18 +15,18 @@ from api.models.enums.subscription_status import SubscriptionStatus
 class SubscriptionService:
     def __init__(
         self, subscription_repo: SubscriptionRepository,
-        tenant_service: TenantService,
-        plan_service: PlanService,
+        tenant_repo: TenantRepository,
+        plan_repo: PlanRepository
     ):
         self.subscription_repo = subscription_repo
-        self.tenant_service = tenant_service
-        self.plan_service = plan_service
+        self.tenant_repo = tenant_repo
+        self.plan_repo = plan_repo
 
     def create(self, dto: SubscriptionCreateDTO) -> Subscription:
-        if not self.tenant_service.get_one(dto.tenant_id):
+        if not self.tenant_repo.get_one(dto.tenant_id):
             raise EntityNotFound("Tenant")
 
-        if not self.plan_service.get_one(dto.plan_id):
+        if not self.plan_repo.get_one(dto.plan_id):
             raise EntityNotFound("Plan")
 
         if dto.status not in SubscriptionStatus:
@@ -58,10 +58,10 @@ class SubscriptionService:
 
     def update(self, subscription_id: int, update_subscription: SubscriptionUpdateDTO) -> None:
 
-        if not self.tenant_service.get_one(tenant_id=update_subscription.tenant_id):
+        if not self.tenant_repo.get_one(tenant_id=update_subscription.tenant_id):
             raise EntityNotFound("Tenant")
 
-        if not self.plan_service.get_one(plan_id=update_subscription.plan_id):
+        if not self.plan_repo.get_one(plan_id=update_subscription.plan_id):
             raise EntityNotFound("Plan")
 
         if update_subscription.status not in SubscriptionStatus:
@@ -91,7 +91,7 @@ class SubscriptionService:
             old_subscription.tenant_id = update.tenant_id
             old_subscription.plan_id = update.plan_id
 
-            self.subscription_repo.update(old_subscription)
+            return self.subscription_repo.update(old_subscription)
 
         except Exception:
             raise InvalidData("Dados de Subscription")

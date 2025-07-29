@@ -21,7 +21,7 @@ class SubscriptionTestFactory(BaseTestFactory):
         )
 
     @classmethod
-    def dto(cls, **kwargs):
+    def dto(cls, **kwargs) -> SubscriptionCreateDTO:
         return SubscriptionCreateDTO(
             status=kwargs.get("status", cls.random_enum(SubscriptionStatus)),
             start_date=kwargs.get("start_date", datetime.now(
@@ -33,7 +33,7 @@ class SubscriptionTestFactory(BaseTestFactory):
         )
 
     @classmethod
-    def update_dto(cls, **kwargs):
+    def update_dto(cls, **kwargs) -> SubscriptionUpdateDTO:
         return SubscriptionUpdateDTO(
             status=kwargs.get("status", cls.random_enum(SubscriptionStatus)),
             start_date=kwargs.get("start_date", datetime.now(
@@ -46,20 +46,20 @@ class SubscriptionTestFactory(BaseTestFactory):
 
     @classmethod
     def create_json(cls, **kwargs):
-        return {{
+        return ({
             "status": kwargs.get("status", cls.random_enum(SubscriptionStatus)),
-            "start_date": kwargs.get("start_date", datetime.now(timezone.utc) + timedelta(days=1)),
-            "end_date": kwargs.get("end_date", datetime.now(timezone.utc) + timedelta(days=2)),
+            "start_date": kwargs.get("start_date", (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()),
+            "end_date": kwargs.get("end_date", (datetime.now(timezone.utc) + timedelta(days=2)).isoformat()),
             "tenant_id": kwargs.get("tenant_id", 1),
             "plan_id": kwargs.get("plan_id", 1)
-        }}
+        })
 
     @classmethod
     def update_json(cls, **kwargs):
-        return {{
+        return ({
             "status": kwargs.get("status", cls.random_enum(SubscriptionStatus)),
-            "start_date": kwargs.get("start_date", datetime.now(timezone.utc) + timedelta(days=1)),
-            "end_date": kwargs.get("end_date", datetime.now(timezone.utc) + timedelta(days=2)),
+            "start_date": kwargs.get("start_date", (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()),
+            "end_date": kwargs.get("end_date", (datetime.now(timezone.utc) + timedelta(days=2)).isoformat()),
             "tenant_id": kwargs.get("tenant_id", 1),
             "plan_id": kwargs.get("plan_id", 1)
-        }}
+        })

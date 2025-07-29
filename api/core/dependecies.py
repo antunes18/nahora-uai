@@ -80,7 +80,7 @@ def get_tenant_services(
 
 def get_subscription_services(
     subscription_repo: SubscriptionRepository = Depends(get_subscription_repo),
-    plan_services: PlanService = Depends(get_plan_services),
-    tenant_services: TenantService = Depends(get_tenant_services)
+    plan_repo: PlanRepository = Depends(get_plan_repo),
+    tenant_repo: TenantRepository = Depends(get_tenant_repo)
 ) -> SubscriptionService:
-    return SubscriptionService(subscription_repo=subscription_repo, plan_service=plan_services, tenant_service=tenant_services)
+    return SubscriptionService(subscription_repo=subscription_repo, plan_repo=plan_repo, tenant_repo=tenant_repo)
