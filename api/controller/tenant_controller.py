@@ -51,7 +51,7 @@ def get_tenant_services(
             "description": "Dados estão incorretos",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def create(
     dto: TenantCreateDTO,

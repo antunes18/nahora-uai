@@ -23,6 +23,6 @@ app.include_router(scheduling_controller.router)
 app.include_router(whatsapp_controller.router)
 
 # app.include_router(invoice_controller.router)
-app.include_router(plan_controller.router)
+# app.include_router(plan_controller.router)
 app.include_router(subscription_controller.router)
 app.include_router(tenant_controller.router)

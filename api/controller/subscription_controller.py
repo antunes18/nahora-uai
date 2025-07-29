@@ -4,6 +4,7 @@ from typing import List
 
 from api.core.database import get_db
 from api.core.dependecies import get_subscription_services
+from api.core.jwt_bearer import JwtBearer
 
 from api.exceptions.message import GenericError
 
@@ -43,7 +44,7 @@ router = APIRouter(prefix="/subscription", tags=["Subscription"])
             "description": "Dados estão incorretos",
         },
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def create(
     obj: SubscriptionCreateDTO,
@@ -71,7 +72,7 @@ def create(
             "description": "Subscriptions não encontradas!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_all(skip: int = 0, limit: int = 100, services: SubscriptionService = Depends(get_subscription_services)):
     return services.get_all(skip=skip, limit=limit)
@@ -96,7 +97,7 @@ def get_all(skip: int = 0, limit: int = 100, services: SubscriptionService = Dep
             "description": "Subscription não encontrada!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def get_one(id: int, services: SubscriptionService = Depends(get_subscription_services)):
     return services.get_one(subscription_id=id)
@@ -118,8 +119,8 @@ def get_one(id: int, services: SubscriptionService = Depends(get_subscription_se
             "model": GenericError,
             "description": "Tenant não encontrada!",
         }
-    }
-    # dependencies=[Depends(JwtBearer())],
+    },
+    dependencies=[Depends(JwtBearer())],
 )
 def update(
     id: int,
@@ -146,7 +147,7 @@ def update(
             "description": "Subscription não encontrada!",
         }
     },
-    # dependencies=[Depends(JwtBearer())],
+    dependencies=[Depends(JwtBearer())],
 )
 def delete(id: int, services: SubscriptionService = Depends(get_subscription_services)):
     return services.delete(subscription_id=id)
