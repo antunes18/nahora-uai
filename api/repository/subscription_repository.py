@@ -20,9 +20,11 @@ class SubscriptionRepository:
     def get_one(self, subscription_id: int) -> Subscription:
         return self.session.query(Subscription).filter(Subscription.id == subscription_id).first()
 
-    def update(self, update_subscription: Subscription) -> None:
+    def update(self, update_subscription: Subscription) -> Subscription:
         self.session.commit()
         self.session.refresh(update_subscription)
+
+        return update_subscription
 
     def delete(self, subscription: Subscription) -> None:
         self.session.delete(subscription)

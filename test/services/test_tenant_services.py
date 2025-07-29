@@ -23,12 +23,12 @@ from test.mocks.tenant import (
 
 class TestTenantServices(BaseMVCTestFactory):
 
-    # def test_get_all(self, mock_tenant_list: List[TenantResponseDTO], mock_tenant_services: TenantService, mock_tenant_repo: Mock):
-    #     mock_tenant_repo.get_all.return_value = mock_tenant_list
-    #     response = mock_tenant_services.get_all(skip=0, limit=100)
-    #
-    #     assert response is not None
-    #     assert len(response) == len(mock_tenant_list)
+    def test_get_all(self, mock_tenant_list: List[TenantResponseDTO], mock_tenant_services: TenantService, mock_tenant_repo: Mock):
+        mock_tenant_repo.get_all.return_value = mock_tenant_list
+        response = mock_tenant_services.get_all(skip=0, limit=100)
+
+        assert response is not None
+        assert len(response) == len(mock_tenant_list)
 
     def test_get_one(self, mock_tenant: Tenant, mock_tenant_services: TenantService, mock_tenant_repo: Mock):
         mock_tenant_repo.get_one.return_value = mock_tenant

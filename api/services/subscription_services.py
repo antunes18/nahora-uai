@@ -9,6 +9,7 @@ from api.exceptions.generics import EntityAlreadyExists, EntityNotFound, Invalid
 
 from api.models.subscription import Subscription
 from api.models.dto.subscription_dto import SubscriptionCreateDTO, SubscriptionResponseDTO, SubscriptionUpdateDTO
+from api.models.enums.subscription_status import SubscriptionStatus
 
 
 class SubscriptionService:
@@ -27,6 +28,9 @@ class SubscriptionService:
 
         if not self.plan_service.get_one(dto.plan_id):
             raise EntityNotFound("Plan")
+
+        if dto.status not in SubscriptionStatus:
+            raise InvalidData("Tipo de status inválido!")
 
         self._validate_time(start_date=dto.start_date, end_date=dto.end_date)
 
@@ -60,6 +64,15 @@ class SubscriptionService:
         if not self.plan_service.get_one(plan_id=update_subscription.plan_id):
             raise EntityNotFound("Plan")
 
+        if update_subscription.status not in SubscriptionStatus:
+            raise InvalidData("Tipo de status inválido!")
+
+        old_subscription: Subscription = self.subscription_repo.get_one(
+            subscription_id=subscription_id)
+
+        if not old_subscription:
+            raise EntityNotFound("Subscription")
+
         update: Subscription = Subscription(
             status=update_subscription.status,
             start_date=update_subscription.start_date,
@@ -67,12 +80,6 @@ class SubscriptionService:
             tenant_id=update_subscription.tenant_id,
             plan_id=update_subscription.plan_id
         )
-
-        old_subscription: Subscription = self.subscription_repo.get_one(
-            subscription_id=subscription_id)
-
-        if not old_subscription:
-            raise EntityNotFound("Subscription")
 
         self._validate_time(start_date=update.start_date,
                             end_date=update.end_date)

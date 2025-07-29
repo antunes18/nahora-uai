@@ -1,8 +1,8 @@
 """scheduling
 
-Revision ID: da910d53c90a
+Revision ID: d7bcc3465d8f
 Revises: 
-Create Date: 2025-07-28 15:50:28.132663
+Create Date: 2025-07-28 20:25:22.819979
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'da910d53c90a'
+revision: str = 'd7bcc3465d8f'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -42,7 +42,7 @@ def upgrade() -> None:
     )
     op.create_table('subscriptions',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('status', sa.String(), nullable=False),
+    sa.Column('status', sa.Enum('active', 'disable', 'pending', name='subscriptionstatus'), nullable=False),
     sa.Column('start_date', sa.DateTime(), nullable=True),
     sa.Column('end_date', sa.DateTime(), nullable=True),
     sa.Column('tenant_id', sa.Integer(), nullable=True),
