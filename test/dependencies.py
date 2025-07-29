@@ -82,6 +82,11 @@ def mock_plan_services(mock_plan_repo: PlanRepository):
 
 
 @pytest.fixture()
+def mock_tenant_services(mock_tenant_repo):
+    return TenantService(tenant_repo=mock_tenant_repo)
+
+
+@pytest.fixture()
 def mock_subscription_services(
         mock_subscription_repo: SubscriptionRepository,
         mock_tenant_repo: TenantRepository,
@@ -92,11 +97,6 @@ def mock_subscription_services(
         tenant_repo=mock_tenant_repo,
         plan_repo=mock_plan_repo
     )
-
-
-@pytest.fixture()
-def mock_tenant_services(mock_tenant_repo):
-    return TenantService(tenant_repo=mock_tenant_repo)
 
 
 # ============= Real Repository ==================

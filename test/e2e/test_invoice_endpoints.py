@@ -4,7 +4,7 @@ from api.core.main import app
 from api.core.dependecies import get_invoice_services
 
 from api.models.invoice import Invoice
-from api.models.dto.invoice_dto import invoiceUpdateDTO
+from api.models.dto.invoice_dto import InvoiceUpdateDTO
 
 from test.factories.base import BaseMVCTestFactory
 
@@ -12,6 +12,7 @@ from test.mocks.invoice import mock_invoice_update
 from test.mocks.mock_token_user import auth_header
 
 from test.mocks.invoice import mock_invoice, mock_invoice_list, test_invoice, create_invoice_json, update_invoice_json
+from test.mocks.subscription import test_subscription
 
 
 class Test_invoice_E2E(BaseMVCTestFactory):
@@ -35,7 +36,7 @@ class Test_invoice_E2E(BaseMVCTestFactory):
 
         app.dependency_overrides.clear()
 
-    def test_create(self, client, test_invoice, auth_header, create_invoice_json):
+    def test_create(self, client, test_invoice, test_subscription, auth_header, create_invoice_json):
         response = client.post(
             "/invoice/", headers=auth_header, json=create_invoice_json)
 

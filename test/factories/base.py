@@ -11,6 +11,10 @@ class BaseTestFactory(ABC):
         return ''.join(random.choices(string.ascii_lowercase, k=length))
 
     @classmethod
+    def random_number(cls, first: int = 1, last: int = 100):
+        return random.randint(first, last)
+
+    @classmethod
     def random_email(cls):
         return f"{cls.random_string()}@test.com"
 

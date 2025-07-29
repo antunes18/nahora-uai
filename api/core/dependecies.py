@@ -72,15 +72,15 @@ def get_invoice_services(
     return InvoiceService(invoice_repo=invoice_repo, subscription_repo=subscription_repo)
 
 
+def get_tenant_services(
+    tenant_repo: TenantRepository = Depends(get_tenant_repo),
+) -> TenantService:
+    return TenantService(tenant_repo=tenant_repo)
+
+
 def get_subscription_services(
     subscription_repo: SubscriptionRepository = Depends(get_subscription_repo),
     plan_repo: PlanRepository = Depends(get_plan_repo),
     tenant_repo: TenantRepository = Depends(get_tenant_repo)
 ) -> SubscriptionService:
     return SubscriptionService(subscription_repo=subscription_repo, plan_repo=plan_repo, tenant_repo=tenant_repo)
-
-
-def get_tenant_services(
-    tenant_repo: TenantRepository = Depends(get_tenant_repo),
-) -> TenantService:
-    return TenantService(tenant_repo=tenant_repo)
