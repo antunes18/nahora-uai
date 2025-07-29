@@ -5,6 +5,7 @@ from api.core.dependecies import get_invoice_services
 
 from api.models.invoice import Invoice
 from api.models.dto.invoice_dto import InvoiceUpdateDTO
+from api.models.enums.invoice_status import InvoiceStatus
 
 from test.factories.base import BaseMVCTestFactory
 
@@ -12,10 +13,10 @@ from test.mocks.invoice import mock_invoice_update
 from test.mocks.mock_token_user import auth_header
 
 from test.mocks.invoice import mock_invoice, mock_invoice_list, test_invoice, create_invoice_json, update_invoice_json
-from test.mocks.subscription import test_subscription
+from test.mocks.subscription import test_subscription, mock_subscription_list
 
 
-class Test_invoice_E2E(BaseMVCTestFactory):
+class Test_Invoice_E2E(BaseMVCTestFactory):
     def test_get_all(self, client, test_invoice, auth_header):
         response = client.get("/invoice", headers=auth_header)
 
@@ -29,8 +30,10 @@ class Test_invoice_E2E(BaseMVCTestFactory):
 
         assert response.status_code == 200
         assert response.json()["status"] == test_invoice[0].status
-        assert response.json()["due_date"] == test_invoice[0].due_date
-        assert response.json()["paid_date"] == test_invoice[0].paid_date
+        assert response.json()[
+            "due_time"] == test_invoice[0].due_time.isoformat()
+        assert response.json()[
+            "paid_date"] == test_invoice[0].paid_date.isoformat()
         assert response.json()[
             "subscription_id"] == test_invoice[0].subscription_id
 
@@ -41,33 +44,36 @@ class Test_invoice_E2E(BaseMVCTestFactory):
             "/invoice/", headers=auth_header, json=create_invoice_json)
 
         assert response.status_code == 201
-        assert response.json()["status"] == test_invoice[0].status
-        assert response.json()[
-            "due_date"] == test_invoice[0].due_date.isoformat()
-        assert response.json()[
-            "paid_date"] == test_invoice[0].paid_date.isoformat()
+        assert response.json()["status"] == InvoiceStatus.pending
+        assert response.json()["due_time"].startswith(
+            create_invoice_json["due_time"].split("+")[0])
+
+        assert response.json()["paid_date"].startswith(
+            create_invoice_json["paid_date"].split("+")[0])
         assert response.json()[
             "subscription_id"] == test_invoice[0].subscription_id
 
         app.dependency_overrides.clear()
 
-    def test_update(self, client, test_invoice, update_invoice_json, auth_header):
+    def test_update(self, client, test_invoice, test_subscription, update_invoice_json, auth_header):
         response = client.put("/invoice/1",
                               headers=auth_header, json=update_invoice_json)
 
         assert response.status_code == 204
 
         result = client.get("/invoice/1", headers=auth_header)
-
         assert result.status_code == 200
-        data = result.json()
 
+        data = result.json()
         assert data is not None
 
-        assert result.status_code == 200
         assert data["status"] == update_invoice_json["status"]
-        assert data["due_date"] == test_invoice[0].due_date
-        assert data["paid_date"] == test_invoice[0].paid_date
+        assert data["due_time"].startswith(
+            update_invoice_json["due_time"].split("+")[0])
+
+        assert data["paid_date"].startswith(
+            update_invoice_json["paid_date"].split("+")[0])
+
         assert data["subscription_id"] == update_invoice_json["subscription_id"]
 
         app.dependency_overrides.clear()

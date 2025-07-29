@@ -45,9 +45,9 @@ class InvoiceFactory(BaseTestFactory):
     def create_json(cls, **kwargs):
         return ({
             "due_time": kwargs.get("due_time", (datetime.now(
-                timezone.utc) + timedelta(days=1))),
+                timezone.utc) + timedelta(days=1)).isoformat()),
             "paid_date": kwargs.get("paid_date", (datetime.now(
-                timezone.utc) + timedelta(days=3))),
+                timezone.utc) + timedelta(days=3)).isoformat()),
             "subscription_id": kwargs.get("subscription_id", 1)
         })
 
@@ -56,8 +56,8 @@ class InvoiceFactory(BaseTestFactory):
         return ({
             "status": kwargs.get("status", cls.random_enum(InvoiceStatus)),
             "due_time": kwargs.get("due_time", (datetime.now(
-                timezone.utc) + timedelta(days=1))),
+                timezone.utc) + timedelta(days=1)).isoformat()),
             "paid_date": kwargs.get("paid_date", (datetime.now(
-                timezone.utc) + timedelta(days=3))),
+                timezone.utc) + timedelta(days=3)).isoformat()),
             "subscription_id": kwargs.get("subscription_id", 1)
         })
